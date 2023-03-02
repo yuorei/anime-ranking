@@ -1,28 +1,40 @@
-# GraphQL schema example
-#
-# https://gqlgen.com/getting-started/
+type User {
+  userID: ID!
+  name: String!
+  password:String!
+}
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
+type AnimeRanking {
+  animeInformation:AnimeInformation!
+  rank: Int!
   user: User!
 }
 
-type User {
-  id: ID!
-  name: String!
+type AnimeInformation {
+  animeID: ID!
+  title: String!
+  imageURL: Boolean!
+  relatedAnime: [AnimeInformation!]
+  registerUser: [User!]
 }
 
 type Query {
-  todos: [Todo!]!
+  GetUserInformation: [User!]!
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
+input UserInformationInput {
+  naem: String!
+  password: String!
+}
+
+input NewAnimeRankingInput {
+  title: String!
+  imageURL: String!
+  rank: Int!
+  userID: ID!
 }
 
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  registerUser(input: UserInformationInput!): User!
+  createAnimeRanking(input: NewAnimeRankingInput!): AnimeRanking!
 }
