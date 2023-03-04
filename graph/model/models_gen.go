@@ -16,20 +16,8 @@ type AnimeRanking struct {
 	User             *User             `json:"user"`
 }
 
-type NewAnimeRankingInput struct {
-	Title    string `json:"title"`
-	ImageURL string `json:"imageURL"`
-	Rank     int    `json:"rank"`
-	UserID   string `json:"userID"`
-}
-
 type User struct {
 	UserID   string `json:"userID"`
 	Name     string `json:"name"`
-	Password string `json:"password"`
-}
-
-type UserInformationInput struct {
-	Naem     string `json:"naem"`
 	Password string `json:"password"`
 }

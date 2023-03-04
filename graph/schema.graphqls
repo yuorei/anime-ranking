@@ -18,10 +18,6 @@ type AnimeInformation {
   registerUser: [User!]
 }
 
-type Query {
-  GetUserInformation: [User!]!
-}
-
 input UserInformationInput {
   naem: String!
   password: String!
@@ -32,6 +28,10 @@ input NewAnimeRankingInput {
   imageURL: String!
   rank: Int!
   userID: ID!
+}
+
+type Query {
+  GetUserInformation: [User!]!
 }
 
 type Mutation {
