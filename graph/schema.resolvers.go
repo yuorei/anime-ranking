@@ -18,15 +18,13 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 
 // CreateAnimeRanking is the resolver for the createAnimeRanking field.
 func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRanking, error) {
-	a := &model.AnimeRanking{
-		AnimeInformation: &model.AnimeInformation{AnimeID: "l", Title: "d", ImageURL: "url"},
-		Rank:             1,
-		User:             &model.User{UserID: "1", Name: "you", Password: "pass"},
+	rankings := &model.AnimeRanking{
+		AnimeInformation: &model.AnimeInformation{AnimeID: "hoge", Title: input.Title, ImageURL: input.ImageURL},
+		Rank:             input.Rank,
+		User:             &model.User{UserID: input.UserID},
 	}
-
-	r.db = append(r.db, a)
-	return a, nil
-	// panic(fmt.Errorf("not implemented: RegisterUser - registerUser"))
+	r.db = append(r.db, rankings)
+	return rankings, nil
 }
 
 // GetUserInformation is the resolver for the GetUserInformation field.
