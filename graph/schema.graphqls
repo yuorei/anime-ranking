@@ -13,7 +13,7 @@ type AnimeRanking {
 type AnimeInformation {
   animeID: ID!
   title: String!
-  imageURL: Boolean!
+  imageURL: String!
   relatedAnime: [AnimeInformation!]
   registerUser: [User!]
 }
@@ -32,6 +32,7 @@ input NewAnimeRankingInput {
 
 type Query {
   GetUserInformation: [User!]!
+  GetAnimeRanking: [AnimeRanking!]!
 }
 
 type Mutation {

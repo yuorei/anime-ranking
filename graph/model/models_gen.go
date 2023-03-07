@@ -5,7 +5,7 @@ package model
 type AnimeInformation struct {
 	AnimeID      string              `json:"animeID"`
 	Title        string              `json:"title"`
-	ImageURL     bool                `json:"imageURL"`
+	ImageURL     string              `json:"imageURL"`
 	RelatedAnime []*AnimeInformation `json:"relatedAnime"`
 	RegisterUser []*User             `json:"registerUser"`
 }

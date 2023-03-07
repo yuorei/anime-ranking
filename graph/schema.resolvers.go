@@ -18,12 +18,26 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 
 // CreateAnimeRanking is the resolver for the createAnimeRanking field.
 func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRanking, error) {
-	panic(fmt.Errorf("not implemented: CreateAnimeRanking - createAnimeRanking"))
+	a := &model.AnimeRanking{
+		AnimeInformation: &model.AnimeInformation{AnimeID: "l", Title: "d", ImageURL: "url"},
+		Rank:             1,
+		User:             &model.User{UserID: "1", Name: "you", Password: "pass"},
+	}
+
+	r.db = append(r.db, a)
+	return a, nil
+	// panic(fmt.Errorf("not implemented: RegisterUser - registerUser"))
 }
 
 // GetUserInformation is the resolver for the GetUserInformation field.
 func (r *queryResolver) GetUserInformation(ctx context.Context) ([]*model.User, error) {
 	panic(fmt.Errorf("not implemented: GetUserInformation - GetUserInformation"))
+}
+
+// GetAnimeRanking is the resolver for the GetAnimeRanking field.
+func (r *queryResolver) GetAnimeRanking(ctx context.Context) ([]*model.AnimeRanking, error) {
+	// panic(fmt.Errorf("not implemented: GetAnimeRanking - GetAnimeRanking"))
+	return r.db, nil
 }
 
 // Mutation returns MutationResolver implementation.
