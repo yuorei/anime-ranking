@@ -6,14 +6,20 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/yuorei/anime-ranking/graph/model"
 )
 
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: RegisterUser - registerUser"))
+	var user model.User
+	pw := input.Password
+	// TODO PassWwordを適切に処理する
+	user.UserID = "userID"
+	user.Password = pw
+	user.Name = input.Naem
+	r.users = append(r.users, &user)
+	return &user, nil
 }
 
 // CreateAnimeRanking is the resolver for the createAnimeRanking field.
@@ -29,7 +35,8 @@ func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.N
 
 // GetUserInformation is the resolver for the GetUserInformation field.
 func (r *queryResolver) GetUserInformation(ctx context.Context) ([]*model.User, error) {
-	panic(fmt.Errorf("not implemented: GetUserInformation - GetUserInformation"))
+	// panic(fmt.Errorf("not implemented: GetUserInformation - GetUserInformation"))
+	return r.users, nil
 }
 
 // GetAnimeRanking is the resolver for the GetAnimeRanking field.

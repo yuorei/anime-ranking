@@ -8,4 +8,5 @@ import "github.com/yuorei/anime-ranking/graph/model"
 
 type Resolver struct{
 	db []*model.AnimeRanking
+	users []*model.User
 }
