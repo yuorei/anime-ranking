@@ -2,6 +2,7 @@ type User {
   userID: ID!
   name: String!
   password:String!
+  relatedAnime:[AnimeRanking!]
 }
 
 type AnimeRanking {

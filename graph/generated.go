@@ -69,9 +69,10 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		Name     func(childComplexity int) int
-		Password func(childComplexity int) int
-		UserID   func(childComplexity int) int
+		Name         func(childComplexity int) int
+		Password     func(childComplexity int) int
+		RelatedAnime func(childComplexity int) int
+		UserID       func(childComplexity int) int
 	}
 }
 
@@ -206,6 +207,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Password(childComplexity), true
+
+	case "User.relatedAnime":
+		if e.complexity.User.RelatedAnime == nil {
+			break
+		}
+
+		return e.complexity.User.RelatedAnime(childComplexity), true
 
 	case "User.userID":
 		if e.complexity.User.UserID == nil {
@@ -613,6 +621,8 @@ func (ec *executionContext) fieldContext_AnimeInformation_registerUser(ctx conte
 				return ec.fieldContext_User_name(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
+			case "relatedAnime":
+				return ec.fieldContext_User_relatedAnime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -765,6 +775,8 @@ func (ec *executionContext) fieldContext_AnimeRanking_user(ctx context.Context, 
 				return ec.fieldContext_User_name(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
+			case "relatedAnime":
+				return ec.fieldContext_User_relatedAnime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -816,6 +828,8 @@ func (ec *executionContext) fieldContext_Mutation_registerUser(ctx context.Conte
 				return ec.fieldContext_User_name(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
+			case "relatedAnime":
+				return ec.fieldContext_User_relatedAnime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -940,6 +954,8 @@ func (ec *executionContext) fieldContext_Query_GetUserInformation(ctx context.Co
 				return ec.fieldContext_User_name(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
+			case "relatedAnime":
+				return ec.fieldContext_User_relatedAnime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -1252,6 +1268,55 @@ func (ec *executionContext) fieldContext_User_password(ctx context.Context, fiel
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_relatedAnime(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_relatedAnime(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RelatedAnime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.AnimeRanking)
+	fc.Result = res
+	return ec.marshalOAnimeRanking2ᚕᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeRankingᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_relatedAnime(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "animeInformation":
+				return ec.fieldContext_AnimeRanking_animeInformation(ctx, field)
+			case "rank":
+				return ec.fieldContext_AnimeRanking_rank(ctx, field)
+			case "user":
+				return ec.fieldContext_AnimeRanking_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AnimeRanking", field.Name)
 		},
 	}
 	return fc, nil
@@ -3365,6 +3430,10 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "relatedAnime":
+
+			out.Values[i] = ec._User_relatedAnime(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4171,6 +4240,53 @@ func (ec *executionContext) marshalOAnimeInformation2ᚕᚖgithubᚗcomᚋyuorei
 				defer wg.Done()
 			}
 			ret[i] = ec.marshalNAnimeInformation2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeInformation(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOAnimeRanking2ᚕᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeRankingᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AnimeRanking) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAnimeRanking2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeRanking(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)

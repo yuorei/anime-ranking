@@ -17,7 +17,8 @@ type AnimeRanking struct {
 }
 
 type User struct {
-	UserID   string `json:"userID"`
-	Name     string `json:"name"`
-	Password string `json:"password"`
+	UserID       string          `json:"userID"`
+	Name         string          `json:"name"`
+	Password     string          `json:"password"`
+	RelatedAnime []*AnimeRanking `json:"relatedAnime"`
 }
