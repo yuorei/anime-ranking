@@ -4,21 +4,33 @@ type User {
   userID: ID!
   name: String!
   password:String!
-  relatedAnime:[AnimeRanking!] @goField(forceResolver: true)
+  haveAnime:[AnimeRanking!] @goField(forceResolver: true)
 }
 
 type AnimeRanking {
   animeInformation:AnimeInformation! @goField(forceResolver: true)
   rank: Int!
-  user: User! @goField(forceResolver: true)
 }
 
 type AnimeInformation {
   animeID: ID!
   title: String!
-  imageURL: String!
+  animeImageURL: String!
   relatedAnime: [AnimeInformation!] @goField(forceResolver: true)
   registerUser: [User!] @goField(forceResolver: true)
+}
+
+type UserPayload{
+  name: String!
+  password: String!
+  profieImageURL: String
+}
+
+type AnimeRankingPayload{
+ title: String!
+ rank: Int!
+ animeImageURL:String
+ relatedAnime: [String]
 }
 
 input UserInformationInput {
@@ -28,9 +40,9 @@ input UserInformationInput {
 
 input NewAnimeRankingInput {
   title: String!
-  imageURL: String!
   rank: Int!
   userID: ID!
+  relatedAnime: [String]
 }
 
 type Query {
@@ -42,6 +54,6 @@ type Query {
 }
 
 type Mutation {
-  registerUser(input: UserInformationInput!): User!
-  registerUserAnimeRanking(input: NewAnimeRankingInput!): AnimeRanking!
+  registerUser(input: UserInformationInput!): UserPayload!
+  registerUserAnimeRanking(input: NewAnimeRankingInput!): AnimeRankingPayload!
 }

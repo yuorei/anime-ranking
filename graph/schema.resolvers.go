@@ -11,27 +11,29 @@ import (
 	"github.com/yuorei/anime-ranking/graph/model"
 )
 
-// RegisterUser is the resolver for the registerUser field.
-func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.User, error) {
-	var user model.User
-	pw := input.Password
-	// TODO PassWwordを適切に処理する
-	user.UserID = "userID"
-	user.Password = pw
-	user.Name = input.Naem
-	r.users = append(r.users, &user)
-	return &user, nil
+// RelatedAnime is the resolver for the relatedAnime field.
+func (r *animeInformationResolver) RelatedAnime(ctx context.Context, obj *model.AnimeInformation) ([]*model.AnimeInformation, error) {
+	panic(fmt.Errorf("not implemented: RelatedAnime - relatedAnime"))
 }
 
-// CreateAnimeRanking is the resolver for the createAnimeRanking field.
-func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRanking, error) {
-	rankings := &model.AnimeRanking{
-		AnimeInformation: &model.AnimeInformation{AnimeID: "hoge", Title: input.Title, ImageURL: input.ImageURL},
-		Rank:             input.Rank,
-		User:             &model.User{UserID: input.UserID},
-	}
-	r.db = append(r.db, rankings)
-	return rankings, nil
+// RegisterUser is the resolver for the registerUser field.
+func (r *animeInformationResolver) RegisterUser(ctx context.Context, obj *model.AnimeInformation) ([]*model.User, error) {
+	panic(fmt.Errorf("not implemented: RegisterUser - registerUser"))
+}
+
+// AnimeInformation is the resolver for the animeInformation field.
+func (r *animeRankingResolver) AnimeInformation(ctx context.Context, obj *model.AnimeRanking) (*model.AnimeInformation, error) {
+	panic(fmt.Errorf("not implemented: AnimeInformation - animeInformation"))
+}
+
+// RegisterUser is the resolver for the registerUser field.
+func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.UserPayload, error) {
+	panic(fmt.Errorf("not implemented: RegisterUser - registerUser"))
+}
+
+// RegisterUserAnimeRanking is the resolver for the registerUserAnimeRanking field.
+func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRankingPayload, error) {
+	panic(fmt.Errorf("not implemented: RegisterUserAnimeRanking - registerUserAnimeRanking"))
 }
 
 // GetUserInformation is the resolver for the GetUserInformation field.
@@ -46,10 +48,21 @@ func (r *queryResolver) GetAnimeRanking(ctx context.Context) ([]*model.AnimeRank
 	return r.db, nil
 }
 
+// HaveAnime is the resolver for the haveAnime field.
+func (r *userResolver) HaveAnime(ctx context.Context, obj *model.User) ([]*model.AnimeRanking, error) {
+	panic(fmt.Errorf("not implemented: HaveAnime - haveAnime"))
+}
+
 // RelatedAnime is the resolver for the relatedAnime field.
-func (r *userResolver) RelatedAnime(ctx context.Context, obj *model.User) ([]*model.AnimeRanking, error) {
+func (r *newAnimeRankingInputResolver) RelatedAnime(ctx context.Context, obj *model.NewAnimeRankingInput, data []*string) error {
 	panic(fmt.Errorf("not implemented: RelatedAnime - relatedAnime"))
 }
+
+// AnimeInformation returns AnimeInformationResolver implementation.
+func (r *Resolver) AnimeInformation() AnimeInformationResolver { return &animeInformationResolver{r} }
+
+// AnimeRanking returns AnimeRankingResolver implementation.
+func (r *Resolver) AnimeRanking() AnimeRankingResolver { return &animeRankingResolver{r} }
 
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
@@ -60,6 +73,14 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 // User returns UserResolver implementation.
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 
+// NewAnimeRankingInput returns NewAnimeRankingInputResolver implementation.
+func (r *Resolver) NewAnimeRankingInput() NewAnimeRankingInputResolver {
+	return &newAnimeRankingInputResolver{r}
+}
+
+type animeInformationResolver struct{ *Resolver }
+type animeRankingResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
+type newAnimeRankingInputResolver struct{ *Resolver }
