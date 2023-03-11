@@ -43,5 +43,5 @@ type Query {
 
 type Mutation {
   registerUser(input: UserInformationInput!): User!
-  createAnimeRanking(input: NewAnimeRankingInput!): AnimeRanking!
+  registerUserAnimeRanking(input: NewAnimeRankingInput!): AnimeRanking!
 }
