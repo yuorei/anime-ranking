@@ -1,4 +1,5 @@
 directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
 type User {
   userID: ID!
   name: String!
@@ -7,17 +8,17 @@ type User {
 }
 
 type AnimeRanking {
-  animeInformation:AnimeInformation!
+  animeInformation:AnimeInformation! @goField(forceResolver: true)
   rank: Int!
-  user: User!
+  user: User! @goField(forceResolver: true)
 }
 
 type AnimeInformation {
   animeID: ID!
   title: String!
   imageURL: String!
-  relatedAnime: [AnimeInformation!]
-  registerUser: [User!]
+  relatedAnime: [AnimeInformation!] @goField(forceResolver: true)
+  registerUser: [User!] @goField(forceResolver: true)
 }
 
 input UserInformationInput {
