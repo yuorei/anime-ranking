@@ -2,19 +2,35 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+type AnimeInformation struct {
+	AnimeID       string              `json:"animeID"`
+	Title         string              `json:"title"`
+	AnimeImageURL string              `json:"animeImageURL"`
+	RelatedAnime  []*AnimeInformation `json:"relatedAnime"`
+	RegisterUser  []*User             `json:"registerUser"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type AnimeRanking struct {
+	AnimeInformation *AnimeInformation `json:"animeInformation"`
+	Rank             int               `json:"rank"`
+}
+
+type AnimeRankingPayload struct {
+	Title         string    `json:"title"`
+	Rank          int       `json:"rank"`
+	AnimeImageURL *string   `json:"animeImageURL"`
+	RelatedAnime  []*string `json:"relatedAnime"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	UserID    string          `json:"userID"`
+	Name      string          `json:"name"`
+	Password  string          `json:"password"`
+	HaveAnime []*AnimeRanking `json:"haveAnime"`
+}
+
+type UserPayload struct {
+	Name           string  `json:"name"`
+	Password       string  `json:"password"`
+	ProfieImageURL *string `json:"profieImageURL"`
 }

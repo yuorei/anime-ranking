@@ -1,28 +1,59 @@
-# GraphQL schema example
-#
-# https://gqlgen.com/getting-started/
-
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
-}
+directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 
 type User {
-  id: ID!
+  userID: ID!
   name: String!
+  password:String!
+  haveAnime:[AnimeRanking!] @goField(forceResolver: true)
+}
+
+type AnimeRanking {
+  animeInformation:AnimeInformation! @goField(forceResolver: true)
+  rank: Int!
+}
+
+type AnimeInformation {
+  animeID: ID!
+  title: String!
+  animeImageURL: String!
+  relatedAnime: [AnimeInformation!] @goField(forceResolver: true)
+  registerUser: [User!] @goField(forceResolver: true)
+}
+
+type UserPayload{
+  name: String!
+  password: String!
+  profieImageURL: String
+}
+
+type AnimeRankingPayload{
+ title: String!
+ rank: Int!
+ animeImageURL:String
+ relatedAnime: [String]
+}
+
+input UserInformationInput {
+  naem: String!
+  password: String!
+}
+
+input NewAnimeRankingInput {
+  title: String!
+  rank: Int!
+  userID: ID!
+  relatedAnime: [String]
 }
 
 type Query {
-  todos: [Todo!]!
-}
-
-input NewTodo {
-  text: String!
-  userId: String!
+  GetUserInformation: [User!]!# クエリ名allとかに変える
+  GetAnimeRanking: [AnimeRanking!]!# クエリ名allとかに変える
+    # ランキングが持っているアニメの参照
+    # アニメが持っているユーザー
+    #
 }
 
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  registerUser(input: UserInformationInput!): UserPayload!
+  registerUserAnimeRanking(input: NewAnimeRankingInput!): AnimeRankingPayload!
 }
