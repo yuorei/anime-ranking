@@ -4,6 +4,7 @@ type User {
   userID: ID!
   name: String!
   password:String!
+  profieImageURL: String
   haveAnime:[AnimeRanking!] @goField(forceResolver: true)
 }
 
