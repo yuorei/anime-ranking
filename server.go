@@ -1,18 +1,31 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/joho/godotenv"
+	"github.com/yuorei/anime-ranking/database/mysql"
 	"github.com/yuorei/anime-ranking/graph"
 )
 
 const defaultPort = "8080"
 
 func main() {
+	var err error
+	err = godotenv.Load(".env")
+	if err != nil {
+		fmt.Printf("読み込み出来ませんでした: %v", err)
+	}
+	_, err = mysql.NewMySQL()
+	if err != nil {
+		log.Fatal("DB接続失敗")
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
