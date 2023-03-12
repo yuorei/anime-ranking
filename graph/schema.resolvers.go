@@ -57,8 +57,8 @@ func (r *queryResolver) GetUserInformation(ctx context.Context) ([]*model.User, 
 
 // GetAnimeRanking is the resolver for the GetAnimeRanking field.
 func (r *queryResolver) GetAnimeRanking(ctx context.Context) ([]*model.AnimeRanking, error) {
-	// panic(fmt.Errorf("not implemented: GetAnimeRanking - GetAnimeRanking"))
-	return r.db, nil
+	panic(fmt.Errorf("not implemented: GetAnimeRanking - GetAnimeRanking"))
+	// return r.db, nil
 }
 
 // HaveAnime is the resolver for the haveAnime field.
