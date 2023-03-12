@@ -22,10 +22,7 @@ func main() {
 		fmt.Printf("読み込み出来ませんでした: %v", err)
 	}
 
-	db:= mysql.NewMySQL()
-	if err != nil {
-		log.Fatal("DB接続失敗")
-	}
+	db := mysql.NewMySQL()
 	db.CreateTable()
 
 	port := os.Getenv("PORT")
