@@ -80,10 +80,11 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		HaveAnime func(childComplexity int) int
-		Name      func(childComplexity int) int
-		Password  func(childComplexity int) int
-		UserID    func(childComplexity int) int
+		HaveAnime      func(childComplexity int) int
+		Name           func(childComplexity int) int
+		Password       func(childComplexity int) int
+		ProfieImageURL func(childComplexity int) int
+		UserID         func(childComplexity int) int
 	}
 
 	UserPayload struct {
@@ -266,6 +267,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Password(childComplexity), true
+
+	case "User.profieImageURL":
+		if e.complexity.User.ProfieImageURL == nil {
+			break
+		}
+
+		return e.complexity.User.ProfieImageURL(childComplexity), true
 
 	case "User.userID":
 		if e.complexity.User.UserID == nil {
@@ -694,6 +702,8 @@ func (ec *executionContext) fieldContext_AnimeInformation_registerUser(ctx conte
 				return ec.fieldContext_User_name(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
+			case "profieImageURL":
+				return ec.fieldContext_User_profieImageURL(ctx, field)
 			case "haveAnime":
 				return ec.fieldContext_User_haveAnime(ctx, field)
 			}
@@ -1143,6 +1153,8 @@ func (ec *executionContext) fieldContext_Query_GetUserInformation(ctx context.Co
 				return ec.fieldContext_User_name(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
+			case "profieImageURL":
+				return ec.fieldContext_User_profieImageURL(ctx, field)
 			case "haveAnime":
 				return ec.fieldContext_User_haveAnime(ctx, field)
 			}
@@ -1448,6 +1460,47 @@ func (ec *executionContext) _User_password(ctx context.Context, field graphql.Co
 }
 
 func (ec *executionContext) fieldContext_User_password(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_profieImageURL(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_profieImageURL(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProfieImageURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_profieImageURL(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -3822,6 +3875,10 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "profieImageURL":
+
+			out.Values[i] = ec._User_profieImageURL(ctx, field, obj)
+
 		case "haveAnime":
 			field := field
 

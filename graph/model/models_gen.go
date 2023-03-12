@@ -23,10 +23,11 @@ type AnimeRankingPayload struct {
 }
 
 type User struct {
-	UserID    string          `json:"userID"`
-	Name      string          `json:"name"`
-	Password  string          `json:"password"`
-	HaveAnime []*AnimeRanking `json:"haveAnime"`
+	UserID         string          `json:"userID"`
+	Name           string          `json:"name"`
+	Password       string          `json:"password"`
+	ProfieImageURL *string         `json:"profieImageURL"`
+	HaveAnime      []*AnimeRanking `json:"haveAnime"`
 }
 
 type UserPayload struct {
