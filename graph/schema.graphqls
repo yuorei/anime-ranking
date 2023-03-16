@@ -35,7 +35,7 @@ type AnimeRankingPayload{
 }
 
 input UserInformationInput {
-  naem: String!
+  name: String!
   password: String!
 }
 
