@@ -8,6 +8,6 @@ type NewAnimeRankingInput struct {
 }
 
 type UserInformationInput struct {
-	Naem     string `json:"naem"`
+	Name    string `json:"name"`
 	Password string `json:"password"`
 }

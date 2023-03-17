@@ -8,6 +8,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/yuorei/anime-ranking/database/mysql"
+	"github.com/yuorei/anime-ranking/database/table"
 	"github.com/yuorei/anime-ranking/graph/model"
 )
 
@@ -29,18 +31,25 @@ func (r *animeRankingResolver) AnimeInformation(ctx context.Context, obj *model.
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.UserPayload, error) {
 	url := "urlだよ"
-	userPayload := &model.UserPayload{
-		Name:           input.Naem,
+
+	user := table.User{
+		Name:           input.Name,
 		Password:       input.Password,
 		ProfieImageURL: &url,
 	}
-	user := &model.User{
-		Name:           userPayload.Name,
-		Password:       userPayload.Password,
-		UserID:         "ランダム",
-		ProfieImageURL: userPayload.ProfieImageURL,
+
+	user, err := mysql.InsertUser(user)
+
+	userPayload := &model.UserPayload{
+		UserID:         int(user.ID),
+		Name:           user.Name,
+		Password:       user.Password,
+		ProfieImageURL: user.ProfieImageURL,
 	}
-	r.Resolver.users = append(r.Resolver.users, user)
+	if err != nil {
+		return userPayload, err
+	}
+
 	return userPayload, nil
 }
 

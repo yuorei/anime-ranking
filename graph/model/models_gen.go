@@ -31,6 +31,7 @@ type User struct {
 }
 
 type UserPayload struct {
+	UserID         int     `json:"userID"`
 	Name           string  `json:"name"`
 	Password       string  `json:"password"`
 	ProfieImageURL *string `json:"profieImageURL"`
