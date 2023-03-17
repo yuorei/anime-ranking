@@ -16,7 +16,10 @@ func GetUserByName(name string) (table.User, error) {
 
 // Check if the password is correct
 func VerifyPassword(userPassword, inputPassword string) bool {
-	return true
+	if userPassword==inputPassword{
+		return true
+	}
+	return false
 }
 
 // Generate a JWT token
