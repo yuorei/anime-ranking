@@ -47,3 +47,9 @@ func InsertUser(user table.User) (table.User, error) {
 
 	return user, nil
 }
+
+func GetUserByName(name string) (table.User, error) {
+	var user table.User
+	db.Conn.Where("name = ?", name).First(&user)
+	return user, nil
+}

@@ -1,10 +1,17 @@
 package auth
 
-import "github.com/yuorei/anime-ranking/database/table"
+import (
+	"github.com/yuorei/anime-ranking/database/mysql"
+	"github.com/yuorei/anime-ranking/database/table"
+)
 
 // Retrieve the user from the database
 func GetUserByName(name string) (table.User, error) {
-	return table.User{}, nil
+	user, err := mysql.GetUserByName(name)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }
 
 // Check if the password is correct
