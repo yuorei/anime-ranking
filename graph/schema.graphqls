@@ -22,6 +22,7 @@ type AnimeInformation {
 }
 
 type UserPayload{
+  userID: Int!
   name: String!
   password: String!
   profieImageURL: String

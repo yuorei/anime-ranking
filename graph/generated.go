@@ -91,6 +91,7 @@ type ComplexityRoot struct {
 		Name           func(childComplexity int) int
 		Password       func(childComplexity int) int
 		ProfieImageURL func(childComplexity int) int
+		UserID         func(childComplexity int) int
 	}
 }
 
@@ -302,6 +303,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UserPayload.ProfieImageURL(childComplexity), true
+
+	case "UserPayload.userID":
+		if e.complexity.UserPayload.UserID == nil {
+			break
+		}
+
+		return e.complexity.UserPayload.UserID(childComplexity), true
 
 	}
 	return 0, false
@@ -1021,6 +1029,8 @@ func (ec *executionContext) fieldContext_Mutation_registerUser(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "userID":
+				return ec.fieldContext_UserPayload_userID(ctx, field)
 			case "name":
 				return ec.fieldContext_UserPayload_name(ctx, field)
 			case "password":
@@ -1555,6 +1565,50 @@ func (ec *executionContext) fieldContext_User_haveAnime(ctx context.Context, fie
 				return ec.fieldContext_AnimeRanking_rank(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AnimeRanking", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserPayload_userID(ctx context.Context, field graphql.CollectedField, obj *model.UserPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserPayload_userID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserPayload_userID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3524,18 +3578,18 @@ func (ec *executionContext) unmarshalInputUserInformationInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"naem", "password"}
+	fieldsInOrder := [...]string{"name", "password"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "naem":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("naem"))
-			it.Naem, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3917,6 +3971,13 @@ func (ec *executionContext) _UserPayload(ctx context.Context, sel ast.SelectionS
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UserPayload")
+		case "userID":
+
+			out.Values[i] = ec._UserPayload_userID(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "name":
 
 			out.Values[i] = ec._UserPayload_name(ctx, field, obj)
