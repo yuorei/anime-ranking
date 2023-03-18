@@ -22,7 +22,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 		return &model.LoginResponse{Success: false}, nil
 	}
 
-	token, err := auth.GenerateToken(user.ID)
+	token, err := auth.GenerateToken(user)
 	if err != nil {
 		return &model.LoginResponse{Success: false}, nil
 	}

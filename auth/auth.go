@@ -27,12 +27,14 @@ func VerifyPassword(userPassword, inputPassword string) bool {
 }
 
 // Generate a JWT token
-func GenerateToken(userID uint) (string, error) {
+func GenerateToken(user table.User) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	// Set claims (payload)
 	claims := token.Claims.(jwt.MapClaims)
-	claims["userId"] = strconv.Itoa(int(userID))
+	claims["name"] = user.Name
+	claims["userId"] = strconv.Itoa(int(user.ID))
+	claims["profile"] = user.ProfieImageURL
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
 	// Generate encoded token and send it as response.
