@@ -1,0 +1,13 @@
+extend type Mutation {
+  login(input: LoginInput!): LoginResponse!
+}
+
+input LoginInput {
+  name: String!
+  password: String!
+}
+
+type LoginResponse {
+  success: Boolean!
+  token: String
+}
