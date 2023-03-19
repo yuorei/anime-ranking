@@ -43,5 +43,5 @@ func GenerateToken(user table.User) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return tokenString,nil
+	return tokenString, nil
 }
