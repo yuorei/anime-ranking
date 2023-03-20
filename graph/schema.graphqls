@@ -1,4 +1,5 @@
-directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+# directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
 
 type User {
   userID: ID!
@@ -48,7 +49,7 @@ input NewAnimeRankingInput {
 }
 
 type Query {
-  GetUserInformation: [User!]!# クエリ名allとかに変える
+  GetUserInformation: [User!]!@auth# クエリ名allとかに変える
   GetAnimeRanking: [AnimeRanking!]!# クエリ名allとかに変える
     # ランキングが持っているアニメの参照
     # アニメが持っているユーザー

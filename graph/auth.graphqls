@@ -1,5 +1,14 @@
+directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+# new directive
+directive @auth on FIELD_DEFINITION
+
+type AuthOps {
+  login(input: LoginInput!): LoginResponse! @goField(forceResolver: true)
+}
+
 extend type Mutation {
-  login(input: LoginInput!): LoginResponse!
+  auth: AuthOps! @goField(forceResolver: true)
 }
 
 input LoginInput {

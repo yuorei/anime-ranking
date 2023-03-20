@@ -8,9 +8,13 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+
 	"github.com/yuorei/anime-ranking/database/mysql"
+	"github.com/yuorei/anime-ranking/directives"
 	"github.com/yuorei/anime-ranking/graph"
+	"github.com/yuorei/anime-ranking/middlewares"
 )
 
 const defaultPort = "8080"
@@ -30,11 +34,24 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	// srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	// // リクエストの認証に必要なJWTトークンの検証を行うauthMiddleware関数を追加する
+	// srv.Use(middlewares.AuthMiddleware)
+	// http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	// http.Handle("/query", srv)
+
+	router := mux.NewRouter()
+	router.Use(middlewares.AuthMiddleware)
+
+	c := graph.Config{Resolvers: &graph.Resolver{}}
+	c.Directives.Auth = directives.Auth
+
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(c))
+
+	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	router.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }
