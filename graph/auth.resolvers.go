@@ -7,22 +7,23 @@ package graph
 import (
 	"context"
 
-	"github.com/yuorei/anime-ranking/auth"
 	"github.com/yuorei/anime-ranking/graph/model"
+	"github.com/yuorei/anime-ranking/service"
 )
 
 // Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.LoginResponse, error) {
-	user, err := auth.GetUserByName(input.Name)
+func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input model.LoginInput) (*model.LoginResponse, error) {
+	user, err := service.GetUserByName(input.Name)
 	if err != nil {
 		return &model.LoginResponse{Success: false}, nil
 	}
 
-	if !auth.VerifyPassword(user.Password, input.Password) {
+	if !service.VerifyPassword(user.Password, input.Password) {
 		return &model.LoginResponse{Success: false}, nil
 	}
 
-	token, err := auth.GenerateToken(user)
+	token, err := service.JwtGenerate(ctx, int(user.ID))
+
 	if err != nil {
 		return &model.LoginResponse{Success: false}, nil
 	}
@@ -32,3 +33,13 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 		Token:   &token,
 	}, nil
 }
+
+// Auth is the resolver for the auth field.
+func (r *mutationResolver) Auth(ctx context.Context) (*model.AuthOps, error) {
+	return &model.AuthOps{}, nil
+}
+
+// AuthOps returns AuthOpsResolver implementation.
+func (r *Resolver) AuthOps() AuthOpsResolver { return &authOpsResolver{r} }
+
+type authOpsResolver struct{ *Resolver }

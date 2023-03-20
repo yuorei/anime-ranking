@@ -22,6 +22,10 @@ type AnimeRankingPayload struct {
 	RelatedAnime  []*string `json:"relatedAnime"`
 }
 
+type AuthOps struct {
+	Login *LoginResponse `json:"login"`
+}
+
 type User struct {
 	UserID         string          `json:"userID"`
 	Name           string          `json:"name"`

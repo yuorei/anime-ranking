@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"net/http"
+
+	"github.com/yuorei/anime-ranking/service"
 )
 
 type authString string
@@ -11,7 +13,6 @@ type authString string
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Header.Get("Authorization")
-
 		if auth == "" {
 			next.ServeHTTP(w, r)
 			return
@@ -29,7 +30,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		customClaim, _ := validate.Claims.(*service.JwtCustomClaim)
 
 		ctx := context.WithValue(r.Context(), authString("auth"), customClaim)
-
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
 	})
