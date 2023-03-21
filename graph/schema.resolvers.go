@@ -75,11 +75,6 @@ func (r *userResolver) HaveAnime(ctx context.Context, obj *model.User) ([]*model
 	panic(fmt.Errorf("not implemented: HaveAnime - haveAnime"))
 }
 
-// RelatedAnime is the resolver for the relatedAnime field.
-func (r *newAnimeRankingInputResolver) RelatedAnime(ctx context.Context, obj *model.NewAnimeRankingInput, data []*string) error {
-	panic(fmt.Errorf("not implemented: RelatedAnime - relatedAnime"))
-}
-
 // AnimeInformation returns AnimeInformationResolver implementation.
 func (r *Resolver) AnimeInformation() AnimeInformationResolver { return &animeInformationResolver{r} }
 
@@ -95,14 +90,8 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 // User returns UserResolver implementation.
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 
-// NewAnimeRankingInput returns NewAnimeRankingInputResolver implementation.
-func (r *Resolver) NewAnimeRankingInput() NewAnimeRankingInputResolver {
-	return &newAnimeRankingInputResolver{r}
-}
-
 type animeInformationResolver struct{ *Resolver }
 type animeRankingResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
-type newAnimeRankingInputResolver struct{ *Resolver }

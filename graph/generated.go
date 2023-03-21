@@ -43,7 +43,6 @@ type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
 	User() UserResolver
-	NewAnimeRankingInput() NewAnimeRankingInputResolver
 }
 
 type DirectiveRoot struct {
@@ -128,10 +127,6 @@ type QueryResolver interface {
 }
 type UserResolver interface {
 	HaveAnime(ctx context.Context, obj *model.User) ([]*model.AnimeRanking, error)
-}
-
-type NewAnimeRankingInputResolver interface {
-	RelatedAnime(ctx context.Context, obj *model.NewAnimeRankingInput, data []*string) error
 }
 
 type executableSchema struct {
@@ -3865,7 +3860,7 @@ func (ec *executionContext) unmarshalInputNewAnimeRankingInput(ctx context.Conte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
-			it.UserID, err = ec.unmarshalNID2string(ctx, v)
+			it.UserID, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3873,11 +3868,8 @@ func (ec *executionContext) unmarshalInputNewAnimeRankingInput(ctx context.Conte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("relatedAnime"))
-			data, err := ec.unmarshalOString2ᚕᚖstring(ctx, v)
+			it.RelatedAnime, err = ec.unmarshalOString2ᚕᚖstring(ctx, v)
 			if err != nil {
-				return it, err
-			}
-			if err = ec.resolvers.NewAnimeRankingInput().RelatedAnime(ctx, &it, data); err != nil {
 				return it, err
 			}
 		}
@@ -4822,21 +4814,6 @@ func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interf
 
 func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
 	res := graphql.MarshalBoolean(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
-}
-
-func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
-	res, err := graphql.UnmarshalID(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	res := graphql.MarshalID(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
