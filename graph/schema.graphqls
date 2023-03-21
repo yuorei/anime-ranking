@@ -1,5 +1,6 @@
 # directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 
+scalar Upload
 
 type User {
   userID: Int!
@@ -45,6 +46,7 @@ input NewAnimeRankingInput {
   title: String!
   rank: Int!
   userID: Int!
+  animeImage: Upload!
   # relatedAnime: [String]
 }
 
