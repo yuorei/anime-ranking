@@ -18,7 +18,7 @@ type AnimeInformation {
   animeID: Int!
   title: String!
   animeImageURL: String!
-  relatedAnime: [AnimeInformation!] @goField(forceResolver: true)
+  # relatedAnime: [AnimeInformation!] @goField(forceResolver: true)
   registerUser: [User!] @goField(forceResolver: true)
 }
 
@@ -33,7 +33,7 @@ type AnimeRankingPayload{
  title: String!
  rank: Int!
  animeImageURL:String
- relatedAnime: [String]
+#  relatedAnime: [String]
 }
 
 input UserInformationInput {
@@ -45,7 +45,7 @@ input NewAnimeRankingInput {
   title: String!
   rank: Int!
   userID: Int!
-  relatedAnime: [String]
+  # relatedAnime: [String]
 }
 
 type Query {

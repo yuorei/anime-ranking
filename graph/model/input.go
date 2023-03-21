@@ -4,7 +4,7 @@ type NewAnimeRankingInput struct {
 	Title        string    `json:"title"`
 	Rank         int       `json:"rank"`
 	UserID       int       `json:"userID"`
-	RelatedAnime []*string `json:"relatedAnime"`
+	// RelatedAnime []*string `json:"relatedAnime"`
 }
 
 type UserInformationInput struct {

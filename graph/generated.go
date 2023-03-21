@@ -54,7 +54,6 @@ type ComplexityRoot struct {
 		AnimeID       func(childComplexity int) int
 		AnimeImageURL func(childComplexity int) int
 		RegisterUser  func(childComplexity int) int
-		RelatedAnime  func(childComplexity int) int
 		Title         func(childComplexity int) int
 	}
 
@@ -66,7 +65,6 @@ type ComplexityRoot struct {
 	AnimeRankingPayload struct {
 		AnimeImageURL func(childComplexity int) int
 		Rank          func(childComplexity int) int
-		RelatedAnime  func(childComplexity int) int
 		Title         func(childComplexity int) int
 	}
 
@@ -107,7 +105,6 @@ type ComplexityRoot struct {
 }
 
 type AnimeInformationResolver interface {
-	RelatedAnime(ctx context.Context, obj *model.AnimeInformation) ([]*model.AnimeInformation, error)
 	RegisterUser(ctx context.Context, obj *model.AnimeInformation) ([]*model.User, error)
 }
 type AnimeRankingResolver interface {
@@ -165,13 +162,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AnimeInformation.RegisterUser(childComplexity), true
 
-	case "AnimeInformation.relatedAnime":
-		if e.complexity.AnimeInformation.RelatedAnime == nil {
-			break
-		}
-
-		return e.complexity.AnimeInformation.RelatedAnime(childComplexity), true
-
 	case "AnimeInformation.title":
 		if e.complexity.AnimeInformation.Title == nil {
 			break
@@ -206,13 +196,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AnimeRankingPayload.Rank(childComplexity), true
-
-	case "AnimeRankingPayload.relatedAnime":
-		if e.complexity.AnimeRankingPayload.RelatedAnime == nil {
-			break
-		}
-
-		return e.complexity.AnimeRankingPayload.RelatedAnime(childComplexity), true
 
 	case "AnimeRankingPayload.title":
 		if e.complexity.AnimeRankingPayload.Title == nil {
@@ -676,59 +659,6 @@ func (ec *executionContext) fieldContext_AnimeInformation_animeImageURL(ctx cont
 	return fc, nil
 }
 
-func (ec *executionContext) _AnimeInformation_relatedAnime(ctx context.Context, field graphql.CollectedField, obj *model.AnimeInformation) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AnimeInformation_relatedAnime(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.AnimeInformation().RelatedAnime(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.AnimeInformation)
-	fc.Result = res
-	return ec.marshalOAnimeInformation2ᚕᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeInformationᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_AnimeInformation_relatedAnime(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AnimeInformation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "animeID":
-				return ec.fieldContext_AnimeInformation_animeID(ctx, field)
-			case "title":
-				return ec.fieldContext_AnimeInformation_title(ctx, field)
-			case "animeImageURL":
-				return ec.fieldContext_AnimeInformation_animeImageURL(ctx, field)
-			case "relatedAnime":
-				return ec.fieldContext_AnimeInformation_relatedAnime(ctx, field)
-			case "registerUser":
-				return ec.fieldContext_AnimeInformation_registerUser(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type AnimeInformation", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _AnimeInformation_registerUser(ctx context.Context, field graphql.CollectedField, obj *model.AnimeInformation) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_AnimeInformation_registerUser(ctx, field)
 	if err != nil {
@@ -827,8 +757,6 @@ func (ec *executionContext) fieldContext_AnimeRanking_animeInformation(ctx conte
 				return ec.fieldContext_AnimeInformation_title(ctx, field)
 			case "animeImageURL":
 				return ec.fieldContext_AnimeInformation_animeImageURL(ctx, field)
-			case "relatedAnime":
-				return ec.fieldContext_AnimeInformation_relatedAnime(ctx, field)
 			case "registerUser":
 				return ec.fieldContext_AnimeInformation_registerUser(ctx, field)
 			}
@@ -999,47 +927,6 @@ func (ec *executionContext) _AnimeRankingPayload_animeImageURL(ctx context.Conte
 }
 
 func (ec *executionContext) fieldContext_AnimeRankingPayload_animeImageURL(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AnimeRankingPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _AnimeRankingPayload_relatedAnime(ctx context.Context, field graphql.CollectedField, obj *model.AnimeRankingPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AnimeRankingPayload_relatedAnime(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.RelatedAnime, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_AnimeRankingPayload_relatedAnime(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "AnimeRankingPayload",
 		Field:      field,
@@ -1306,8 +1193,6 @@ func (ec *executionContext) fieldContext_Mutation_registerUserAnimeRanking(ctx c
 				return ec.fieldContext_AnimeRankingPayload_rank(ctx, field)
 			case "animeImageURL":
 				return ec.fieldContext_AnimeRankingPayload_animeImageURL(ctx, field)
-			case "relatedAnime":
-				return ec.fieldContext_AnimeRankingPayload_relatedAnime(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AnimeRankingPayload", field.Name)
 		},
@@ -3833,7 +3718,7 @@ func (ec *executionContext) unmarshalInputNewAnimeRankingInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "rank", "userID", "relatedAnime"}
+	fieldsInOrder := [...]string{"title", "rank", "userID"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3861,14 +3746,6 @@ func (ec *executionContext) unmarshalInputNewAnimeRankingInput(ctx context.Conte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
 			it.UserID, err = ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "relatedAnime":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("relatedAnime"))
-			it.RelatedAnime, err = ec.unmarshalOString2ᚕᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3953,23 +3830,6 @@ func (ec *executionContext) _AnimeInformation(ctx context.Context, sel ast.Selec
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "relatedAnime":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._AnimeInformation_relatedAnime(ctx, field, obj)
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
 		case "registerUser":
 			field := field
 
@@ -4073,10 +3933,6 @@ func (ec *executionContext) _AnimeRankingPayload(ctx context.Context, sel ast.Se
 		case "animeImageURL":
 
 			out.Values[i] = ec._AnimeRankingPayload_animeImageURL(ctx, field, obj)
-
-		case "relatedAnime":
-
-			out.Values[i] = ec._AnimeRankingPayload_relatedAnime(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -5202,53 +5058,6 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalOAnimeInformation2ᚕᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeInformationᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AnimeInformation) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNAnimeInformation2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeInformation(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
 func (ec *executionContext) marshalOAnimeRanking2ᚕᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeRankingᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AnimeRanking) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -5320,38 +5129,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
-}
-
-func (ec *executionContext) unmarshalOString2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*string, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOString2ᚖstring(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalOString2ᚕᚖstring(ctx context.Context, sel ast.SelectionSet, v []*string) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	for i := range v {
-		ret[i] = ec.marshalOString2ᚖstring(ctx, sel, v[i])
-	}
-
-	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
