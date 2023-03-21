@@ -2,7 +2,7 @@
 
 
 type User {
-  userID: ID!
+  userID: Int!
   name: String!
   password:String!
   profieImageURL: String
@@ -15,7 +15,7 @@ type AnimeRanking {
 }
 
 type AnimeInformation {
-  animeID: ID!
+  animeID: Int!
   title: String!
   animeImageURL: String!
   relatedAnime: [AnimeInformation!] @goField(forceResolver: true)
@@ -44,7 +44,7 @@ input UserInformationInput {
 input NewAnimeRankingInput {
   title: String!
   rank: Int!
-  userID: ID!
+  userID: Int!
   relatedAnime: [String]
 }
 

@@ -3,7 +3,7 @@
 package model
 
 type AnimeInformation struct {
-	AnimeID       string              `json:"animeID"`
+	AnimeID       int                 `json:"animeID"`
 	Title         string              `json:"title"`
 	AnimeImageURL string              `json:"animeImageURL"`
 	RelatedAnime  []*AnimeInformation `json:"relatedAnime"`
@@ -27,7 +27,7 @@ type AuthOps struct {
 }
 
 type User struct {
-	UserID         string          `json:"userID"`
+	UserID         int             `json:"userID"`
 	Name           string          `json:"name"`
 	Password       string          `json:"password"`
 	ProfieImageURL *string         `json:"profieImageURL"`
