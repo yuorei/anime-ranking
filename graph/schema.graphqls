@@ -46,7 +46,7 @@ input NewAnimeRankingInput {
   title: String!
   rank: Int!
   userID: Int!
-  animeImage: Upload!
+  animeImage: Upload
   # relatedAnime: [String]
 }
 

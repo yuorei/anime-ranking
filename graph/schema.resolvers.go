@@ -8,6 +8,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/yuorei/anime-ranking/database/mysql"
 	"github.com/yuorei/anime-ranking/database/table"
 	"github.com/yuorei/anime-ranking/graph/model"
@@ -50,7 +53,32 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 
 // RegisterUserAnimeRanking is the resolver for the registerUserAnimeRanking field.
 func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRankingPayload, error) {
-	panic(fmt.Errorf("not implemented: RegisterUserAnimeRanking - registerUserAnimeRanking"))
+	// The session the S3 Uploader will use
+	sess, err := session.NewSessionWithOptions(session.Options{
+		Config:  aws.Config{Region: aws.String("ap-northeast-1")},
+		Profile: "default",
+	})
+	if err != nil {
+		return nil, err
+	}
+	// Create an uploader with the session and default options
+	uploader := s3manager.NewUploader(sess)
+
+	bucketName := ""
+	objectKey := "aaa5.png"
+
+	// Upload the file to S3.
+	result, err := uploader.Upload(&s3manager.UploadInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(objectKey),
+		Body:   input.AnimeImage.File,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("file uploaded to, %s\n", result.Location)
+	return &model.AnimeRankingPayload{}, nil
 }
 
 // GetUserInformation is the resolver for the GetUserInformation field.
