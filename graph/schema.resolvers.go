@@ -108,7 +108,7 @@ func (r *queryResolver) GetUserInformation(ctx context.Context) ([]*model.User, 
 	customClaim := middlewares.CtxValue(ctx)
 	userID := customClaim.ID
 
-	fmt.Println(userID)
+	fmt.Println(userID,customClaim.Name)
 	return r.users, nil
 }
 
