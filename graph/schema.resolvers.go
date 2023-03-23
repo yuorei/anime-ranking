@@ -27,15 +27,18 @@ func (r *animeRankingResolver) AnimeInformation(ctx context.Context, obj *model.
 
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.UserPayload, error) {
-	url := "urlだよ"
+	result, err := application.AWSS3Upload(input.ProfieImage.File, input.ProfieImage.Filename)
+	if err != nil {
+		return nil, err
+	}
 
 	user := table.User{
 		Name:           input.Name,
 		Password:       input.Password,
-		ProfieImageURL: url,
+		ProfieImageURL: result.Location,
 	}
 
-	user, err := mysql.InsertUser(user)
+	user, err = mysql.InsertUser(user)
 
 	userPayload := &model.UserPayload{
 		UserID:         int(user.ID),
