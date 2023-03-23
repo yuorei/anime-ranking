@@ -32,7 +32,7 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 	user := table.User{
 		Name:           input.Name,
 		Password:       input.Password,
-		ProfieImageURL: &url,
+		ProfieImageURL: url,
 	}
 
 	user, err := mysql.InsertUser(user)
