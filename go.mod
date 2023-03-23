@@ -4,8 +4,9 @@ go 1.19
 
 require (
 	github.com/99designs/gqlgen v0.17.25
-	github.com/aws/aws-sdk-go v1.44.225
+	github.com/aws/aws-sdk-go v1.44.227
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
 	github.com/joho/godotenv v1.5.1
 	github.com/vektah/gqlparser/v2 v2.5.1
