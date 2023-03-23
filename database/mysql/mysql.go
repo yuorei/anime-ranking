@@ -36,7 +36,11 @@ func NewMySQL() {
 
 func CreateTable() {
 	if err := db.Conn.AutoMigrate(&table.User{}); err != nil {
-		log.Fatalf("Database create table failed失敗")
+		log.Fatalf("Database create table failed")
+	}
+
+	if err := db.Conn.AutoMigrate(&table.AnimeRanking{}); err != nil {
+		log.Fatalf("Database create table failed")
 	}
 }
 
