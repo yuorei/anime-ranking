@@ -54,7 +54,7 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRankingPayload, error) {
 	customClaim := middlewares.CtxValue(ctx)
 
-	result, err := application.AWSS3Upload(input)
+	result, err := application.AWSS3Upload(input.AnimeImage.File, input.AnimeImage.Filename)
 	if err != nil {
 		return nil, err
 	}

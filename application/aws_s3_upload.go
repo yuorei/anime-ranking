@@ -2,6 +2,7 @@ package application
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -9,10 +10,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/google/uuid"
-	"github.com/yuorei/anime-ranking/graph/model"
 )
 
-func AWSS3Upload(input model.NewAnimeRankingInput) (*s3manager.UploadOutput, error) {
+func AWSS3Upload(file io.Reader, filename string) (*s3manager.UploadOutput, error) {
 	// The session the S3 Uploader will use
 	sess, err := session.NewSessionWithOptions(session.Options{
 		Config:  aws.Config{Region: aws.String(os.Getenv("S3_REGION"))},
@@ -25,7 +25,7 @@ func AWSS3Upload(input model.NewAnimeRankingInput) (*s3manager.UploadOutput, err
 	uploader := s3manager.NewUploader(sess)
 
 	bucketName := os.Getenv("S3_BUCKET_NAME")
-	arr1 := strings.Split(input.AnimeImage.Filename, ".")
+	arr1 := strings.Split(filename, ".")
 	uu, _ := uuid.NewRandom()
 	objectKey := uu.String() + "." + arr1[1]
 
@@ -33,7 +33,7 @@ func AWSS3Upload(input model.NewAnimeRankingInput) (*s3manager.UploadOutput, err
 	result, err := uploader.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(objectKey),
-		Body:   input.AnimeImage.File,
+		Body:   file,
 	})
 	if err != nil {
 		return nil, err
