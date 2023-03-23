@@ -57,3 +57,11 @@ func GetUserByName(name string) (table.User, error) {
 	db.Conn.Where("name = ?", name).First(&user)
 	return user, nil
 }
+
+func InsertAnimeRanking(anime table.AnimeRanking) (table.AnimeRanking, error) {
+	if err := db.Conn.Create(&anime).Error; err != nil {
+		return anime, err
+	}
+
+	return anime, nil
+}

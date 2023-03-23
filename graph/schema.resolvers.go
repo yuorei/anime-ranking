@@ -57,7 +57,7 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 
 // RegisterUserAnimeRanking is the resolver for the registerUserAnimeRanking field.
 func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRankingPayload, error) {
-	// customClaim := middlewares.CtxValue(ctx)
+	customClaim := middlewares.CtxValue(ctx)
 	// fmt.Println(customClaim.ID, customClaim.Name)
 
 	// The session the S3 Uploader will use
@@ -87,6 +87,17 @@ func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input m
 	}
 
 	fmt.Printf("file uploaded to, %s\n", result.Location)
+	anime := table.AnimeRanking{
+		UserID:        customClaim.ID,
+		Title:         input.Title,
+		Rank:          input.Rank,
+		AnimeImageURL: result.Location,
+	}
+
+	anime, err = mysql.InsertAnimeRanking(anime)
+	if err != nil {
+		return nil, err
+	}
 
 	return &model.AnimeRankingPayload{
 		Title:         input.Title,
