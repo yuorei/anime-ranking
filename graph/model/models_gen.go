@@ -15,9 +15,9 @@ type AnimeRanking struct {
 }
 
 type AnimeRankingPayload struct {
-	Title         string  `json:"title"`
-	Rank          int     `json:"rank"`
-	AnimeImageURL *string `json:"animeImageURL"`
+	Title         string `json:"title"`
+	Rank          int    `json:"rank"`
+	AnimeImageURL string `json:"animeImageURL"`
 }
 
 type AuthOps struct {
