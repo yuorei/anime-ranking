@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -14,6 +15,8 @@ import (
 	"github.com/yuorei/anime-ranking/database/mysql"
 	"github.com/yuorei/anime-ranking/database/table"
 	"github.com/yuorei/anime-ranking/graph/model"
+	"github.com/yuorei/anime-ranking/middlewares"
+	"github.com/yuorei/anime-ranking/service"
 )
 
 // RegisterUser is the resolver for the registerUser field.
@@ -53,6 +56,25 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 
 // RegisterUserAnimeRanking is the resolver for the registerUserAnimeRanking field.
 func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRankingPayload, error) {
+	// userIDをコンテキストから取得する
+	// userID, ok := ctx.Value("userID").(int)
+	// if !ok {
+	// 	return nil, fmt.Errorf("userID not found in context")
+	// }
+	// AuthorizationヘッダーからJWTトークンを取得
+	tokenString := strings.Replace(ctx.Value("Authorization").(string), "Bearer ", "", 1)
+	fmt.Println(tokenString, "ddddd")
+	// JWTトークンからuserIDを取得
+	// token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	// 	return []byte(secretKey), nil
+	// })
+	token, err := service.JwtValidate(ctx, tokenString)
+	if err != nil {
+		// エラー処理
+	}
+	var claims = token.Claims.(*service.JwtCustomClaim)
+	userID := claims.ID
+	fmt.Println(userID)
 	// The session the S3 Uploader will use
 	sess, err := session.NewSessionWithOptions(session.Options{
 		Config:  aws.Config{Region: aws.String("ap-northeast-1")},
@@ -83,7 +105,10 @@ func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input m
 
 // GetUserInformation is the resolver for the GetUserInformation field.
 func (r *queryResolver) GetUserInformation(ctx context.Context) ([]*model.User, error) {
-	// panic(fmt.Errorf("not implemented: GetUserInformation - GetUserInformation"))
+	customClaim := middlewares.CtxValue(ctx)
+	userID := customClaim.ID
+
+	fmt.Println(userID)
 	return r.users, nil
 }
 
