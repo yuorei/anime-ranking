@@ -7,16 +7,17 @@ package graph
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/google/uuid"
 	"github.com/yuorei/anime-ranking/database/mysql"
 	"github.com/yuorei/anime-ranking/database/table"
 	"github.com/yuorei/anime-ranking/graph/model"
 	"github.com/yuorei/anime-ranking/middlewares"
-	"github.com/yuorei/anime-ranking/service"
 )
 
 // RegisterUser is the resolver for the registerUser field.
@@ -56,28 +57,12 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 
 // RegisterUserAnimeRanking is the resolver for the registerUserAnimeRanking field.
 func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRankingPayload, error) {
-	// userIDをコンテキストから取得する
-	// userID, ok := ctx.Value("userID").(int)
-	// if !ok {
-	// 	return nil, fmt.Errorf("userID not found in context")
-	// }
-	// AuthorizationヘッダーからJWTトークンを取得
-	tokenString := strings.Replace(ctx.Value("Authorization").(string), "Bearer ", "", 1)
-	fmt.Println(tokenString, "ddddd")
-	// JWTトークンからuserIDを取得
-	// token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-	// 	return []byte(secretKey), nil
-	// })
-	token, err := service.JwtValidate(ctx, tokenString)
-	if err != nil {
-		// エラー処理
-	}
-	var claims = token.Claims.(*service.JwtCustomClaim)
-	userID := claims.ID
-	fmt.Println(userID)
+	// customClaim := middlewares.CtxValue(ctx)
+	// fmt.Println(customClaim.ID, customClaim.Name)
+
 	// The session the S3 Uploader will use
 	sess, err := session.NewSessionWithOptions(session.Options{
-		Config:  aws.Config{Region: aws.String("ap-northeast-1")},
+		Config:  aws.Config{Region: aws.String(os.Getenv("S3_REGION"))},
 		Profile: "default",
 	})
 	if err != nil {
@@ -86,8 +71,10 @@ func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input m
 	// Create an uploader with the session and default options
 	uploader := s3manager.NewUploader(sess)
 
-	bucketName := ""
-	objectKey := "aaa5.png"
+	bucketName := os.Getenv("S3_BUCKET_NAME")
+	arr1 := strings.Split(input.AnimeImage.Filename, ".")
+	uu, _ := uuid.NewRandom()
+	objectKey := uu.String() + "." + arr1[1]
 
 	// Upload the file to S3.
 	result, err := uploader.Upload(&s3manager.UploadInput{
@@ -100,7 +87,12 @@ func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input m
 	}
 
 	fmt.Printf("file uploaded to, %s\n", result.Location)
-	return &model.AnimeRankingPayload{}, nil
+
+	return &model.AnimeRankingPayload{
+		Title:         input.Title,
+		Rank:          input.Rank,
+		AnimeImageURL: result.Location,
+	}, nil
 }
 
 // GetUserInformation is the resolver for the GetUserInformation field.
@@ -108,7 +100,7 @@ func (r *queryResolver) GetUserInformation(ctx context.Context) ([]*model.User, 
 	customClaim := middlewares.CtxValue(ctx)
 	userID := customClaim.ID
 
-	fmt.Println(userID,customClaim.Name)
+	fmt.Println(userID, customClaim.Name)
 	return r.users, nil
 }
 
