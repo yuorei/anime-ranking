@@ -36,7 +36,11 @@ func NewMySQL() {
 
 func CreateTable() {
 	if err := db.Conn.AutoMigrate(&table.User{}); err != nil {
-		log.Fatalf("Database create table failed失敗")
+		log.Fatalf("Database create table failed")
+	}
+
+	if err := db.Conn.AutoMigrate(&table.AnimeRanking{}); err != nil {
+		log.Fatalf("Database create table failed")
 	}
 }
 
@@ -52,4 +56,12 @@ func GetUserByName(name string) (table.User, error) {
 	var user table.User
 	db.Conn.Where("name = ?", name).First(&user)
 	return user, nil
+}
+
+func InsertAnimeRanking(anime table.AnimeRanking) (table.AnimeRanking, error) {
+	if err := db.Conn.Create(&anime).Error; err != nil {
+		return anime, err
+	}
+
+	return anime, nil
 }

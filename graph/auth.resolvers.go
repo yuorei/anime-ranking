@@ -22,7 +22,7 @@ func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input m
 		return &model.LoginResponse{Success: false}, nil
 	}
 
-	token, err := service.JwtGenerate(ctx, int(user.ID))
+	token, err := service.JwtGenerate(ctx, user)
 
 	if err != nil {
 		return &model.LoginResponse{Success: false}, nil

@@ -7,16 +7,18 @@ package graph
 import (
 	"context"
 	"fmt"
+	"os"
+	"strings"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/google/uuid"
 	"github.com/yuorei/anime-ranking/database/mysql"
 	"github.com/yuorei/anime-ranking/database/table"
 	"github.com/yuorei/anime-ranking/graph/model"
+	"github.com/yuorei/anime-ranking/middlewares"
 )
-
-// RelatedAnime is the resolver for the relatedAnime field.
-func (r *animeInformationResolver) RelatedAnime(ctx context.Context, obj *model.AnimeInformation) ([]*model.AnimeInformation, error) {
-	panic(fmt.Errorf("not implemented: RelatedAnime - relatedAnime"))
-}
 
 // RegisterUser is the resolver for the registerUser field.
 func (r *animeInformationResolver) RegisterUser(ctx context.Context, obj *model.AnimeInformation) ([]*model.User, error) {
@@ -55,12 +57,61 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 
 // RegisterUserAnimeRanking is the resolver for the registerUserAnimeRanking field.
 func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRankingPayload, error) {
-	panic(fmt.Errorf("not implemented: RegisterUserAnimeRanking - registerUserAnimeRanking"))
+	customClaim := middlewares.CtxValue(ctx)
+	// fmt.Println(customClaim.ID, customClaim.Name)
+
+	// The session the S3 Uploader will use
+	sess, err := session.NewSessionWithOptions(session.Options{
+		Config:  aws.Config{Region: aws.String(os.Getenv("S3_REGION"))},
+		Profile: "default",
+	})
+	if err != nil {
+		return nil, err
+	}
+	// Create an uploader with the session and default options
+	uploader := s3manager.NewUploader(sess)
+
+	bucketName := os.Getenv("S3_BUCKET_NAME")
+	arr1 := strings.Split(input.AnimeImage.Filename, ".")
+	uu, _ := uuid.NewRandom()
+	objectKey := uu.String() + "." + arr1[1]
+
+	// Upload the file to S3.
+	result, err := uploader.Upload(&s3manager.UploadInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(objectKey),
+		Body:   input.AnimeImage.File,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("file uploaded to, %s\n", result.Location)
+	anime := table.AnimeRanking{
+		UserID:        customClaim.ID,
+		Title:         input.Title,
+		Rank:          input.Rank,
+		AnimeImageURL: result.Location,
+	}
+
+	anime, err = mysql.InsertAnimeRanking(anime)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.AnimeRankingPayload{
+		Title:         input.Title,
+		Rank:          input.Rank,
+		AnimeImageURL: result.Location,
+	}, nil
 }
 
 // GetUserInformation is the resolver for the GetUserInformation field.
 func (r *queryResolver) GetUserInformation(ctx context.Context) ([]*model.User, error) {
-	// panic(fmt.Errorf("not implemented: GetUserInformation - GetUserInformation"))
+	customClaim := middlewares.CtxValue(ctx)
+	userID := customClaim.ID
+
+	fmt.Println(userID, customClaim.Name)
 	return r.users, nil
 }
 
@@ -73,11 +124,6 @@ func (r *queryResolver) GetAnimeRanking(ctx context.Context) ([]*model.AnimeRank
 // HaveAnime is the resolver for the haveAnime field.
 func (r *userResolver) HaveAnime(ctx context.Context, obj *model.User) ([]*model.AnimeRanking, error) {
 	panic(fmt.Errorf("not implemented: HaveAnime - haveAnime"))
-}
-
-// RelatedAnime is the resolver for the relatedAnime field.
-func (r *newAnimeRankingInputResolver) RelatedAnime(ctx context.Context, obj *model.NewAnimeRankingInput, data []*string) error {
-	panic(fmt.Errorf("not implemented: RelatedAnime - relatedAnime"))
 }
 
 // AnimeInformation returns AnimeInformationResolver implementation.
@@ -95,14 +141,8 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 // User returns UserResolver implementation.
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 
-// NewAnimeRankingInput returns NewAnimeRankingInputResolver implementation.
-func (r *Resolver) NewAnimeRankingInput() NewAnimeRankingInputResolver {
-	return &newAnimeRankingInputResolver{r}
-}
-
 type animeInformationResolver struct{ *Resolver }
 type animeRankingResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
-type newAnimeRankingInputResolver struct{ *Resolver }

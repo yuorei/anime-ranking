@@ -7,10 +7,12 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/yuorei/anime-ranking/database/table"
 )
 
 type JwtCustomClaim struct {
-	ID int `json:"id"`
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 	jwt.StandardClaims
 }
 
@@ -24,9 +26,10 @@ func getJwtSecret() string {
 	return secret
 }
 
-func JwtGenerate(ctx context.Context, userID int) (string, error) {
+func JwtGenerate(ctx context.Context, user table.User) (string, error) {
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, &JwtCustomClaim{
-		ID: userID,
+		ID:   int(user.ID),
+		Name: user.Name,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
 			IssuedAt:  time.Now().Unix(),

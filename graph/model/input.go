@@ -1,13 +1,14 @@
 package model
 
+import "github.com/99designs/gqlgen/graphql"
+
 type NewAnimeRankingInput struct {
-	Title    string `json:"title"`
-	ImageURL string `json:"imageURL"`
-	Rank     int    `json:"rank"`
-	UserID   string `json:"userID"`
+	Title      string         `json:"title"`
+	Rank       int            `json:"rank"`
+	AnimeImage graphql.Upload `json:"animeImage"`
 }
 
 type UserInformationInput struct {
-	Name    string `json:"name"`
+	Name     string `json:"name"`
 	Password string `json:"password"`
 }

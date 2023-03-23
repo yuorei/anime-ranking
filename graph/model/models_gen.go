@@ -3,11 +3,10 @@
 package model
 
 type AnimeInformation struct {
-	AnimeID       string              `json:"animeID"`
-	Title         string              `json:"title"`
-	AnimeImageURL string              `json:"animeImageURL"`
-	RelatedAnime  []*AnimeInformation `json:"relatedAnime"`
-	RegisterUser  []*User             `json:"registerUser"`
+	AnimeID       int     `json:"animeID"`
+	Title         string  `json:"title"`
+	AnimeImageURL string  `json:"animeImageURL"`
+	RegisterUser  []*User `json:"registerUser"`
 }
 
 type AnimeRanking struct {
@@ -16,10 +15,9 @@ type AnimeRanking struct {
 }
 
 type AnimeRankingPayload struct {
-	Title         string    `json:"title"`
-	Rank          int       `json:"rank"`
-	AnimeImageURL *string   `json:"animeImageURL"`
-	RelatedAnime  []*string `json:"relatedAnime"`
+	Title         string `json:"title"`
+	Rank          int    `json:"rank"`
+	AnimeImageURL string `json:"animeImageURL"`
 }
 
 type AuthOps struct {
@@ -27,7 +25,7 @@ type AuthOps struct {
 }
 
 type User struct {
-	UserID         string          `json:"userID"`
+	UserID         int             `json:"userID"`
 	Name           string          `json:"name"`
 	Password       string          `json:"password"`
 	ProfieImageURL *string         `json:"profieImageURL"`
