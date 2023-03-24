@@ -65,3 +65,12 @@ func InsertAnimeRanking(anime table.AnimeRanking) (table.AnimeRanking, error) {
 
 	return anime, nil
 }
+
+func GetAllUsers() ([]*table.User, error) {
+	var users []*table.User
+	// Get all records
+	if err := db.Conn.Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
+}

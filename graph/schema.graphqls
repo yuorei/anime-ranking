@@ -6,7 +6,7 @@ type User {
   userID: Int!
   name: String!
   password:String!
-  profieImageURL: String
+  profieImageURL: String!
   haveAnime:[AnimeRanking!] @goField(forceResolver: true)
 }
 
@@ -27,7 +27,7 @@ type UserPayload{
   userID: Int!
   name: String!
   password: String!
-  profieImageURL: String
+  profieImageURL: String!
 }
 
 type AnimeRankingPayload{
@@ -40,6 +40,7 @@ type AnimeRankingPayload{
 input UserInformationInput {
   name: String!
   password: String!
+  profieImage: Upload!
 }
 
 input NewAnimeRankingInput {
@@ -50,8 +51,8 @@ input NewAnimeRankingInput {
 }
 
 type Query {
-  GetUserInformation: [User!]!@auth# クエリ名allとかに変える
-  GetAnimeRanking: [AnimeRanking!]!# クエリ名allとかに変える
+  GetAllUserInformation: [User!]!# クエリ名allとかに変える
+  GetAllAnimeRanking: [AnimeRanking!]!# クエリ名allとかに変える
     # ランキングが持っているアニメの参照
     # アニメが持っているユーザー
     #

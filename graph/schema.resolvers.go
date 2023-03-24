@@ -7,13 +7,8 @@ package graph
 import (
 	"context"
 	"fmt"
-	"os"
-	"strings"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/google/uuid"
+	"github.com/yuorei/anime-ranking/application"
 	"github.com/yuorei/anime-ranking/database/mysql"
 	"github.com/yuorei/anime-ranking/database/table"
 	"github.com/yuorei/anime-ranking/graph/model"
@@ -32,15 +27,18 @@ func (r *animeRankingResolver) AnimeInformation(ctx context.Context, obj *model.
 
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.UserPayload, error) {
-	url := "urlだよ"
+	result, err := application.AWSS3Upload(input.ProfieImage.File, input.ProfieImage.Filename)
+	if err != nil {
+		return nil, err
+	}
 
 	user := table.User{
 		Name:           input.Name,
 		Password:       input.Password,
-		ProfieImageURL: &url,
+		ProfieImageURL: result.Location,
 	}
 
-	user, err := mysql.InsertUser(user)
+	user, err = mysql.InsertUser(user)
 
 	userPayload := &model.UserPayload{
 		UserID:         int(user.ID),
@@ -58,35 +56,12 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 // RegisterUserAnimeRanking is the resolver for the registerUserAnimeRanking field.
 func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRankingPayload, error) {
 	customClaim := middlewares.CtxValue(ctx)
-	// fmt.Println(customClaim.ID, customClaim.Name)
 
-	// The session the S3 Uploader will use
-	sess, err := session.NewSessionWithOptions(session.Options{
-		Config:  aws.Config{Region: aws.String(os.Getenv("S3_REGION"))},
-		Profile: "default",
-	})
-	if err != nil {
-		return nil, err
-	}
-	// Create an uploader with the session and default options
-	uploader := s3manager.NewUploader(sess)
-
-	bucketName := os.Getenv("S3_BUCKET_NAME")
-	arr1 := strings.Split(input.AnimeImage.Filename, ".")
-	uu, _ := uuid.NewRandom()
-	objectKey := uu.String() + "." + arr1[1]
-
-	// Upload the file to S3.
-	result, err := uploader.Upload(&s3manager.UploadInput{
-		Bucket: aws.String(bucketName),
-		Key:    aws.String(objectKey),
-		Body:   input.AnimeImage.File,
-	})
+	result, err := application.AWSS3Upload(input.AnimeImage.File, input.AnimeImage.Filename)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Printf("file uploaded to, %s\n", result.Location)
 	anime := table.AnimeRanking{
 		UserID:        customClaim.ID,
 		Title:         input.Title,
@@ -106,19 +81,29 @@ func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input m
 	}, nil
 }
 
-// GetUserInformation is the resolver for the GetUserInformation field.
-func (r *queryResolver) GetUserInformation(ctx context.Context) ([]*model.User, error) {
-	customClaim := middlewares.CtxValue(ctx)
-	userID := customClaim.ID
+// GetAllUserInformation is the resolver for the GetAllUserInformation field.
+func (r *queryResolver) GetAllUserInformation(ctx context.Context) ([]*model.User, error) {
+	users, err := mysql.GetAllUsers()
+	if err != nil {
+		return nil, err
+	}
 
-	fmt.Println(userID, customClaim.Name)
-	return r.users, nil
+	newUsers := make([]*model.User, len(users))
+	for i, user := range users {
+		newUsers[i] = &model.User{
+			UserID:         int(user.ID),
+			Name:           user.Name,
+			Password:       user.Password,
+			ProfieImageURL: user.ProfieImageURL,
+			HaveAnime:      nil, // HaveAnimeフィールドは初期値をnilに設定
+		}
+	}
+	return newUsers, nil
 }
 
-// GetAnimeRanking is the resolver for the GetAnimeRanking field.
-func (r *queryResolver) GetAnimeRanking(ctx context.Context) ([]*model.AnimeRanking, error) {
-	panic(fmt.Errorf("not implemented: GetAnimeRanking - GetAnimeRanking"))
-	// return r.db, nil
+// GetAllAnimeRanking is the resolver for the GetAllAnimeRanking field.
+func (r *queryResolver) GetAllAnimeRanking(ctx context.Context) ([]*model.AnimeRanking, error) {
+	panic(fmt.Errorf("not implemented: GetAllAnimeRanking - GetAllAnimeRanking"))
 }
 
 // HaveAnime is the resolver for the haveAnime field.
