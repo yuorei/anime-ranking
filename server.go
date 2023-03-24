@@ -10,6 +10,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 
 	"github.com/yuorei/anime-ranking/database/mysql"
 	"github.com/yuorei/anime-ranking/directives"
@@ -48,9 +49,17 @@ func main() {
 	c.Directives.Auth = directives.Auth
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(c))
+	// CORSの設定
+	corsOpts := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:3000"}, // 許可するOriginを指定
+		AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodOptions},
+		AllowedHeaders: []string{"Content-Type"},
+	})
+	router.PathPrefix("/query").Handler(corsOpts.Handler(srv))
+    router.PathPrefix("/").Handler(playground.Handler("GraphQL playground", "/query"))
 
-	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	router.Handle("/query", srv)
+	// router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	// router.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, router))
