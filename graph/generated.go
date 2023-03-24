@@ -84,8 +84,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetAnimeRanking    func(childComplexity int) int
-		GetUserInformation func(childComplexity int) int
+		GetAllAnimeRanking    func(childComplexity int) int
+		GetAllUserInformation func(childComplexity int) int
 	}
 
 	User struct {
@@ -119,8 +119,8 @@ type MutationResolver interface {
 	Auth(ctx context.Context) (*model.AuthOps, error)
 }
 type QueryResolver interface {
-	GetUserInformation(ctx context.Context) ([]*model.User, error)
-	GetAnimeRanking(ctx context.Context) ([]*model.AnimeRanking, error)
+	GetAllUserInformation(ctx context.Context) ([]*model.User, error)
+	GetAllAnimeRanking(ctx context.Context) ([]*model.AnimeRanking, error)
 }
 type UserResolver interface {
 	HaveAnime(ctx context.Context, obj *model.User) ([]*model.AnimeRanking, error)
@@ -261,19 +261,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RegisterUserAnimeRanking(childComplexity, args["input"].(model.NewAnimeRankingInput)), true
 
-	case "Query.GetAnimeRanking":
-		if e.complexity.Query.GetAnimeRanking == nil {
+	case "Query.GetAllAnimeRanking":
+		if e.complexity.Query.GetAllAnimeRanking == nil {
 			break
 		}
 
-		return e.complexity.Query.GetAnimeRanking(childComplexity), true
+		return e.complexity.Query.GetAllAnimeRanking(childComplexity), true
 
-	case "Query.GetUserInformation":
-		if e.complexity.Query.GetUserInformation == nil {
+	case "Query.GetAllUserInformation":
+		if e.complexity.Query.GetAllUserInformation == nil {
 			break
 		}
 
-		return e.complexity.Query.GetUserInformation(childComplexity), true
+		return e.complexity.Query.GetAllUserInformation(childComplexity), true
 
 	case "User.haveAnime":
 		if e.complexity.User.HaveAnime == nil {
@@ -1281,8 +1281,8 @@ func (ec *executionContext) fieldContext_Mutation_auth(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_GetUserInformation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_GetUserInformation(ctx, field)
+func (ec *executionContext) _Query_GetAllUserInformation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_GetAllUserInformation(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1294,28 +1294,8 @@ func (ec *executionContext) _Query_GetUserInformation(ctx context.Context, field
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().GetUserInformation(rctx)
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Auth == nil {
-				return nil, errors.New("directive auth is not implemented")
-			}
-			return ec.directives.Auth(ctx, nil, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]*model.User); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/yuorei/anime-ranking/graph/model.User`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetAllUserInformation(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1331,7 +1311,7 @@ func (ec *executionContext) _Query_GetUserInformation(ctx context.Context, field
 	return ec.marshalNUser2ᚕᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_GetUserInformation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_GetAllUserInformation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -1356,8 +1336,8 @@ func (ec *executionContext) fieldContext_Query_GetUserInformation(ctx context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_GetAnimeRanking(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_GetAnimeRanking(ctx, field)
+func (ec *executionContext) _Query_GetAllAnimeRanking(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_GetAllAnimeRanking(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1370,7 +1350,7 @@ func (ec *executionContext) _Query_GetAnimeRanking(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetAnimeRanking(rctx)
+		return ec.resolvers.Query().GetAllAnimeRanking(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1386,7 +1366,7 @@ func (ec *executionContext) _Query_GetAnimeRanking(ctx context.Context, field gr
 	return ec.marshalNAnimeRanking2ᚕᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeRankingᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_GetAnimeRanking(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_GetAllAnimeRanking(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -4120,7 +4100,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "GetUserInformation":
+		case "GetAllUserInformation":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -4129,7 +4109,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_GetUserInformation(ctx, field)
+				res = ec._Query_GetAllUserInformation(ctx, field)
 				return res
 			}
 
@@ -4140,7 +4120,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "GetAnimeRanking":
+		case "GetAllAnimeRanking":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -4149,7 +4129,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_GetAnimeRanking(ctx, field)
+				res = ec._Query_GetAllAnimeRanking(ctx, field)
 				return res
 			}
 

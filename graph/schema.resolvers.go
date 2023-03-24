@@ -81,19 +81,29 @@ func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input m
 	}, nil
 }
 
-// GetUserInformation is the resolver for the GetUserInformation field.
-func (r *queryResolver) GetUserInformation(ctx context.Context) ([]*model.User, error) {
-	customClaim := middlewares.CtxValue(ctx)
-	userID := customClaim.ID
+// GetAllUserInformation is the resolver for the GetAllUserInformation field.
+func (r *queryResolver) GetAllUserInformation(ctx context.Context) ([]*model.User, error) {
+	users, err := mysql.GetAllUsers()
+	if err != nil {
+		return nil, err
+	}
 
-	fmt.Println(userID, customClaim.Name)
-	return r.users, nil
+	newUsers := make([]*model.User, len(users))
+	for i, user := range users {
+		newUsers[i] = &model.User{
+			UserID:         int(user.ID),
+			Name:           user.Name,
+			Password:       user.Password,
+			ProfieImageURL: user.ProfieImageURL,
+			HaveAnime:      nil, // HaveAnimeフィールドは初期値をnilに設定
+		}
+	}
+	return newUsers, nil
 }
 
-// GetAnimeRanking is the resolver for the GetAnimeRanking field.
-func (r *queryResolver) GetAnimeRanking(ctx context.Context) ([]*model.AnimeRanking, error) {
-	panic(fmt.Errorf("not implemented: GetAnimeRanking - GetAnimeRanking"))
-	// return r.db, nil
+// GetAllAnimeRanking is the resolver for the GetAllAnimeRanking field.
+func (r *queryResolver) GetAllAnimeRanking(ctx context.Context) ([]*model.AnimeRanking, error) {
+	panic(fmt.Errorf("not implemented: GetAllAnimeRanking - GetAllAnimeRanking"))
 }
 
 // HaveAnime is the resolver for the haveAnime field.
