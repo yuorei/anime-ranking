@@ -45,18 +45,19 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 }
 
 // CreateAnimeRanking is the resolver for the createAnimeRanking field.
-func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, userID int, animeRanking model.NewAnimeRankingInput) (*model.AnimeRanking, error) {
+func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRanking, error) {
 	customClaim := middlewares.CtxValue(ctx)
 
-	result, err := application.AWSS3Upload(animeRanking.AnimeImage.File, animeRanking.AnimeImage.Filename)
+	result, err := application.AWSS3Upload(input.AnimeImage.File, input.AnimeImage.Filename)
 	if err != nil {
 		return nil, err
 	}
 
 	anime := table.AnimeRanking{
 		UserID:        customClaim.ID,
-		Title:         animeRanking.Title,
-		Rank:          animeRanking.Rank,
+		Title:         input.Title,
+		Rank:          input.Rank,
+		Description:   input.Description,
 		AnimeImageURL: result.Location,
 	}
 
@@ -66,14 +67,16 @@ func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, userID int, a
 	}
 
 	return &model.AnimeRanking{
+		AnimeID:       anime.UserID,
 		Title:         anime.Title,
 		Rank:          anime.Rank,
+		Description:   &anime.Description,
 		AnimeImageURL: result.Location,
 	}, nil
 }
 
 // UpdateAnimeRanking is the resolver for the updateAnimeRanking field.
-func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, id int, animeRanking model.NewAnimeRankingInput) (*model.AnimeRanking, error) {
+func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, id int, input model.NewAnimeRankingInput) (*model.AnimeRanking, error) {
 	panic(fmt.Errorf("not implemented: UpdateAnimeRanking - updateAnimeRanking"))
 }
 
@@ -130,11 +133,22 @@ func (r *queryResolver) GetAnimeRanking(ctx context.Context, id int) (*model.Ani
 	return result, nil
 }
 
+// Description is the resolver for the description field.
+func (r *userInformationInputResolver) Description(ctx context.Context, obj *model.UserInformationInput, data *string) error {
+	panic(fmt.Errorf("not implemented: Description - description"))
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// UserInformationInput returns UserInformationInputResolver implementation.
+func (r *Resolver) UserInformationInput() UserInformationInputResolver {
+	return &userInformationInputResolver{r}
+}
+
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type userInformationInputResolver struct{ *Resolver }
