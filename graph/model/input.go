@@ -12,5 +12,6 @@ type NewAnimeRankingInput struct {
 type UserInformationInput struct {
 	Name        string         `json:"name"`
 	Password    string         `json:"password"`
+	Description string         `json:"description"`
 	ProfieImage graphql.Upload `json:"profieImage"`
 }
