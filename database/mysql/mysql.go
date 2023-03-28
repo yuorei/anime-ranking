@@ -74,3 +74,11 @@ func GetAllUsers() ([]*table.User, error) {
 	}
 	return users, nil
 }
+
+func GetAnimeRankinByUserID(id int) (table.AnimeRanking, error) {
+	var animeRanking table.AnimeRanking
+	if err := db.Conn.First(&animeRanking, 10).Error; err != nil {
+		return table.AnimeRanking{}, err
+	}
+	return animeRanking, nil
+}
