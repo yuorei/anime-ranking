@@ -22,10 +22,3 @@ type User struct {
 	ProfieImageURL string          `json:"profieImageURL"`
 	HaveAnime      []*AnimeRanking `json:"haveAnime"`
 }
-
-type UserPayload struct {
-	UserID         int    `json:"userID"`
-	Name           string `json:"name"`
-	Password       string `json:"password"`
-	ProfieImageURL string `json:"profieImageURL"`
-}

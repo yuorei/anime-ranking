@@ -16,7 +16,7 @@ import (
 )
 
 // RegisterUser is the resolver for the registerUser field.
-func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.UserPayload, error) {
+func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.User, error) {
 	result, err := application.AWSS3Upload(input.ProfieImage.File, input.ProfieImage.Filename)
 	if err != nil {
 		return nil, err
@@ -30,11 +30,12 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 
 	user, err = mysql.InsertUser(user)
 
-	userPayload := &model.UserPayload{
+	userPayload := &model.User{
 		UserID:         int(user.ID),
 		Name:           user.Name,
 		Password:       user.Password,
 		ProfieImageURL: user.ProfieImageURL,
+		HaveAnime:      nil,
 	}
 	if err != nil {
 		return userPayload, err

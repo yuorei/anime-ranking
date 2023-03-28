@@ -87,20 +87,13 @@ type ComplexityRoot struct {
 		ProfieImageURL func(childComplexity int) int
 		UserID         func(childComplexity int) int
 	}
-
-	UserPayload struct {
-		Name           func(childComplexity int) int
-		Password       func(childComplexity int) int
-		ProfieImageURL func(childComplexity int) int
-		UserID         func(childComplexity int) int
-	}
 }
 
 type AuthOpsResolver interface {
 	Login(ctx context.Context, obj *model.AuthOps, input model.LoginInput) (*model.LoginResponse, error)
 }
 type MutationResolver interface {
-	RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.UserPayload, error)
+	RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.User, error)
 	GetAnimeRanking(ctx context.Context, id int) (*model.AnimeRanking, error)
 	CreateAnimeRanking(ctx context.Context, userID int, animeRanking model.NewAnimeRankingInput) (*model.AnimeRanking, error)
 	UpdateAnimeRanking(ctx context.Context, id int, animeRanking model.NewAnimeRankingInput) (*model.AnimeRanking, error)
@@ -323,34 +316,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.UserID(childComplexity), true
-
-	case "UserPayload.name":
-		if e.complexity.UserPayload.Name == nil {
-			break
-		}
-
-		return e.complexity.UserPayload.Name(childComplexity), true
-
-	case "UserPayload.password":
-		if e.complexity.UserPayload.Password == nil {
-			break
-		}
-
-		return e.complexity.UserPayload.Password(childComplexity), true
-
-	case "UserPayload.profieImageURL":
-		if e.complexity.UserPayload.ProfieImageURL == nil {
-			break
-		}
-
-		return e.complexity.UserPayload.ProfieImageURL(childComplexity), true
-
-	case "UserPayload.userID":
-		if e.complexity.UserPayload.UserID == nil {
-			break
-		}
-
-		return e.complexity.UserPayload.UserID(childComplexity), true
 
 	}
 	return 0, false
@@ -1066,9 +1031,9 @@ func (ec *executionContext) _Mutation_registerUser(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.UserPayload)
+	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNUserPayload2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐUserPayload(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_registerUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1080,15 +1045,17 @@ func (ec *executionContext) fieldContext_Mutation_registerUser(ctx context.Conte
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "userID":
-				return ec.fieldContext_UserPayload_userID(ctx, field)
+				return ec.fieldContext_User_userID(ctx, field)
 			case "name":
-				return ec.fieldContext_UserPayload_name(ctx, field)
+				return ec.fieldContext_User_name(ctx, field)
 			case "password":
-				return ec.fieldContext_UserPayload_password(ctx, field)
+				return ec.fieldContext_User_password(ctx, field)
 			case "profieImageURL":
-				return ec.fieldContext_UserPayload_profieImageURL(ctx, field)
+				return ec.fieldContext_User_profieImageURL(ctx, field)
+			case "haveAnime":
+				return ec.fieldContext_User_haveAnime(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type UserPayload", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
 	defer func() {
@@ -1938,182 +1905,6 @@ func (ec *executionContext) fieldContext_User_haveAnime(ctx context.Context, fie
 				return ec.fieldContext_AnimeRanking_user(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AnimeRanking", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _UserPayload_userID(ctx context.Context, field graphql.CollectedField, obj *model.UserPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_UserPayload_userID(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UserID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_UserPayload_userID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "UserPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _UserPayload_name(ctx context.Context, field graphql.CollectedField, obj *model.UserPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_UserPayload_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_UserPayload_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "UserPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _UserPayload_password(ctx context.Context, field graphql.CollectedField, obj *model.UserPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_UserPayload_password(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Password, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_UserPayload_password(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "UserPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _UserPayload_profieImageURL(ctx context.Context, field graphql.CollectedField, obj *model.UserPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_UserPayload_profieImageURL(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ProfieImageURL, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_UserPayload_profieImageURL(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "UserPayload",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4381,55 +4172,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
-var userPayloadImplementors = []string{"UserPayload"}
-
-func (ec *executionContext) _UserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UserPayload) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, userPayloadImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("UserPayload")
-		case "userID":
-
-			out.Values[i] = ec._UserPayload_userID(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "name":
-
-			out.Values[i] = ec._UserPayload_name(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "password":
-
-			out.Values[i] = ec._UserPayload_password(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "profieImageURL":
-
-			out.Values[i] = ec._UserPayload_profieImageURL(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var __DirectiveImplementors = []string{"__Directive"}
 
 func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionSet, obj *introspection.Directive) graphql.Marshaler {
@@ -4904,6 +4646,10 @@ func (ec *executionContext) marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋg
 	return res
 }
 
+func (ec *executionContext) marshalNUser2githubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
+	return ec._User(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -4961,20 +4707,6 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrank
 func (ec *executionContext) unmarshalNUserInformationInput2githubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐUserInformationInput(ctx context.Context, v interface{}) (model.UserInformationInput, error) {
 	res, err := ec.unmarshalInputUserInformationInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNUserPayload2githubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐUserPayload(ctx context.Context, sel ast.SelectionSet, v model.UserPayload) graphql.Marshaler {
-	return ec._UserPayload(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNUserPayload2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐUserPayload(ctx context.Context, sel ast.SelectionSet, v *model.UserPayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._UserPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

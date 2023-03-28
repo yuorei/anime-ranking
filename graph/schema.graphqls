@@ -20,13 +20,6 @@ type AnimeRanking {
   user: User!
 }
 
-type UserPayload{
-  userID: Int!
-  name: String!
-  password: String!
-  profieImageURL: String!
-}
-
 input UserInformationInput {
   name: String!
   password: String!
@@ -51,7 +44,7 @@ type Query {
 }
 
 type Mutation {
-  registerUser(input: UserInformationInput!): UserPayload!
+  registerUser(input: UserInformationInput!): User!
   # registerUserAnimeRanking(input: NewAnimeRankingInput!): AnimeRankingPayload!@auth
   getAnimeRanking(id:Int!):AnimeRanking!
   createAnimeRanking(userId: Int!, animeRanking: NewAnimeRankingInput!): AnimeRanking!
