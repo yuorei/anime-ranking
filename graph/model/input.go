@@ -3,9 +3,10 @@ package model
 import "github.com/99designs/gqlgen/graphql"
 
 type NewAnimeRankingInput struct {
-	Title      string         `json:"title"`
-	Rank       int            `json:"rank"`
-	AnimeImage graphql.Upload `json:"animeImage"`
+	Title       string         `json:"title"`
+	Rank        int            `json:"rank"`
+	Description string         `json:"description"`
+	AnimeImage  graphql.Upload `json:"animeImage"`
 }
 
 type UserInformationInput struct {

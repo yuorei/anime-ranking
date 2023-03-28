@@ -16,16 +16,6 @@ import (
 )
 
 // RegisterUser is the resolver for the registerUser field.
-func (r *animeInformationResolver) RegisterUser(ctx context.Context, obj *model.AnimeInformation) ([]*model.User, error) {
-	panic(fmt.Errorf("not implemented: RegisterUser - registerUser"))
-}
-
-// AnimeInformation is the resolver for the animeInformation field.
-func (r *animeRankingResolver) AnimeInformation(ctx context.Context, obj *model.AnimeRanking) (*model.AnimeInformation, error) {
-	panic(fmt.Errorf("not implemented: AnimeInformation - animeInformation"))
-}
-
-// RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.UserPayload, error) {
 	result, err := application.AWSS3Upload(input.ProfieImage.File, input.ProfieImage.Filename)
 	if err != nil {
@@ -53,19 +43,31 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 	return userPayload, nil
 }
 
-// RegisterUserAnimeRanking is the resolver for the registerUserAnimeRanking field.
-func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRankingPayload, error) {
+// GetUserAnimeRankings is the resolver for the getUserAnimeRankings field.
+func (r *mutationResolver) GetUserAnimeRankings(ctx context.Context, userID int) ([]*model.AnimeRanking, error) {
+	anime, err := mysql.GetAnimeRankinByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+	result := &model.AnimeRanking{
+		Rank: anime.Rank,
+	}
+	return result, nil
+}
+
+// CreateAnimeRanking is the resolver for the createAnimeRanking field.
+func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, userID int, animeRanking model.NewAnimeRankingInput) (*model.AnimeRanking, error) {
 	customClaim := middlewares.CtxValue(ctx)
 
-	result, err := application.AWSS3Upload(input.AnimeImage.File, input.AnimeImage.Filename)
+	result, err := application.AWSS3Upload(animeRanking.AnimeImage.File, animeRanking.AnimeImage.Filename)
 	if err != nil {
 		return nil, err
 	}
 
 	anime := table.AnimeRanking{
 		UserID:        customClaim.ID,
-		Title:         input.Title,
-		Rank:          input.Rank,
+		Title:         animeRanking.Title,
+		Rank:          animeRanking.Rank,
 		AnimeImageURL: result.Location,
 	}
 
@@ -74,11 +76,21 @@ func (r *mutationResolver) RegisterUserAnimeRanking(ctx context.Context, input m
 		return nil, err
 	}
 
-	return &model.AnimeRankingPayload{
-		Title:         input.Title,
-		Rank:          input.Rank,
+	return &model.AnimeRanking{
+		Title:         anime.Title,
+		Rank:          anime.Rank,
 		AnimeImageURL: result.Location,
 	}, nil
+}
+
+// UpdateAnimeRanking is the resolver for the updateAnimeRanking field.
+func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, id int, animeRanking model.NewAnimeRankingInput) (*model.AnimeRanking, error) {
+	panic(fmt.Errorf("not implemented: UpdateAnimeRanking - updateAnimeRanking"))
+}
+
+// DeleteAnimeRanking is the resolver for the deleteAnimeRanking field.
+func (r *mutationResolver) DeleteAnimeRanking(ctx context.Context, id int) (bool, error) {
+	panic(fmt.Errorf("not implemented: DeleteAnimeRanking - deleteAnimeRanking"))
 }
 
 // GetAllUserInformation is the resolver for the GetAllUserInformation field.
@@ -106,16 +118,10 @@ func (r *queryResolver) GetAllAnimeRanking(ctx context.Context) ([]*model.AnimeR
 	panic(fmt.Errorf("not implemented: GetAllAnimeRanking - GetAllAnimeRanking"))
 }
 
-// HaveAnime is the resolver for the haveAnime field.
-func (r *userResolver) HaveAnime(ctx context.Context, obj *model.User) ([]*model.AnimeRanking, error) {
-	panic(fmt.Errorf("not implemented: HaveAnime - haveAnime"))
+// User is the resolver for the user field.
+func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
 }
-
-// AnimeInformation returns AnimeInformationResolver implementation.
-func (r *Resolver) AnimeInformation() AnimeInformationResolver { return &animeInformationResolver{r} }
-
-// AnimeRanking returns AnimeRankingResolver implementation.
-func (r *Resolver) AnimeRanking() AnimeRankingResolver { return &animeRankingResolver{r} }
 
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
@@ -123,11 +129,7 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-// User returns UserResolver implementation.
-func (r *Resolver) User() UserResolver { return &userResolver{r} }
-
-type animeInformationResolver struct{ *Resolver }
-type animeRankingResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-type userResolver struct{ *Resolver }
+
+
