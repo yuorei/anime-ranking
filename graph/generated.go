@@ -69,14 +69,13 @@ type ComplexityRoot struct {
 		Auth               func(childComplexity int) int
 		CreateAnimeRanking func(childComplexity int, userID int, animeRanking model.NewAnimeRankingInput) int
 		DeleteAnimeRanking func(childComplexity int, id int) int
-		GetAnimeRanking    func(childComplexity int, id int) int
 		RegisterUser       func(childComplexity int, input model.UserInformationInput) int
 		UpdateAnimeRanking func(childComplexity int, id int, animeRanking model.NewAnimeRankingInput) int
 	}
 
 	Query struct {
-		GetAllAnimeRanking    func(childComplexity int) int
 		GetAllUserInformation func(childComplexity int) int
+		GetAnimeRanking       func(childComplexity int, id int) int
 		User                  func(childComplexity int, id int) int
 	}
 
@@ -94,7 +93,6 @@ type AuthOpsResolver interface {
 }
 type MutationResolver interface {
 	RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.User, error)
-	GetAnimeRanking(ctx context.Context, id int) (*model.AnimeRanking, error)
 	CreateAnimeRanking(ctx context.Context, userID int, animeRanking model.NewAnimeRankingInput) (*model.AnimeRanking, error)
 	UpdateAnimeRanking(ctx context.Context, id int, animeRanking model.NewAnimeRankingInput) (*model.AnimeRanking, error)
 	DeleteAnimeRanking(ctx context.Context, id int) (bool, error)
@@ -102,8 +100,8 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	GetAllUserInformation(ctx context.Context) ([]*model.User, error)
-	GetAllAnimeRanking(ctx context.Context) ([]*model.AnimeRanking, error)
 	User(ctx context.Context, id int) (*model.User, error)
+	GetAnimeRanking(ctx context.Context, id int) (*model.AnimeRanking, error)
 }
 
 type executableSchema struct {
@@ -220,18 +218,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteAnimeRanking(childComplexity, args["id"].(int)), true
 
-	case "Mutation.getAnimeRanking":
-		if e.complexity.Mutation.GetAnimeRanking == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_getAnimeRanking_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.GetAnimeRanking(childComplexity, args["id"].(int)), true
-
 	case "Mutation.registerUser":
 		if e.complexity.Mutation.RegisterUser == nil {
 			break
@@ -256,19 +242,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateAnimeRanking(childComplexity, args["id"].(int), args["animeRanking"].(model.NewAnimeRankingInput)), true
 
-	case "Query.GetAllAnimeRanking":
-		if e.complexity.Query.GetAllAnimeRanking == nil {
-			break
-		}
-
-		return e.complexity.Query.GetAllAnimeRanking(childComplexity), true
-
 	case "Query.GetAllUserInformation":
 		if e.complexity.Query.GetAllUserInformation == nil {
 			break
 		}
 
 		return e.complexity.Query.GetAllUserInformation(childComplexity), true
+
+	case "Query.getAnimeRanking":
+		if e.complexity.Query.GetAnimeRanking == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getAnimeRanking_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetAnimeRanking(childComplexity, args["id"].(int)), true
 
 	case "Query.user":
 		if e.complexity.Query.User == nil {
@@ -462,21 +453,6 @@ func (ec *executionContext) field_Mutation_deleteAnimeRanking_args(ctx context.C
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_getAnimeRanking_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 int
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_registerUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -528,6 +504,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getAnimeRanking_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -1072,74 +1063,6 @@ func (ec *executionContext) fieldContext_Mutation_registerUser(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_getAnimeRanking(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_getAnimeRanking(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().GetAnimeRanking(rctx, fc.Args["id"].(int))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.AnimeRanking)
-	fc.Result = res
-	return ec.marshalNAnimeRanking2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeRanking(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_getAnimeRanking(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "animeID":
-				return ec.fieldContext_AnimeRanking_animeID(ctx, field)
-			case "title":
-				return ec.fieldContext_AnimeRanking_title(ctx, field)
-			case "description":
-				return ec.fieldContext_AnimeRanking_description(ctx, field)
-			case "animeImageURL":
-				return ec.fieldContext_AnimeRanking_animeImageURL(ctx, field)
-			case "rank":
-				return ec.fieldContext_AnimeRanking_rank(ctx, field)
-			case "user":
-				return ec.fieldContext_AnimeRanking_user(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type AnimeRanking", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_getAnimeRanking_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mutation_createAnimeRanking(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createAnimeRanking(ctx, field)
 	if err != nil {
@@ -1153,8 +1076,28 @@ func (ec *executionContext) _Mutation_createAnimeRanking(ctx context.Context, fi
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateAnimeRanking(rctx, fc.Args["userId"].(int), fc.Args["animeRanking"].(model.NewAnimeRankingInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().CreateAnimeRanking(rctx, fc.Args["userId"].(int), fc.Args["animeRanking"].(model.NewAnimeRankingInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AnimeRanking); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/yuorei/anime-ranking/graph/model.AnimeRanking`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1221,8 +1164,28 @@ func (ec *executionContext) _Mutation_updateAnimeRanking(ctx context.Context, fi
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateAnimeRanking(rctx, fc.Args["id"].(int), fc.Args["animeRanking"].(model.NewAnimeRankingInput))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateAnimeRanking(rctx, fc.Args["id"].(int), fc.Args["animeRanking"].(model.NewAnimeRankingInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AnimeRanking); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/yuorei/anime-ranking/graph/model.AnimeRanking`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1289,8 +1252,28 @@ func (ec *executionContext) _Mutation_deleteAnimeRanking(ctx context.Context, fi
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteAnimeRanking(rctx, fc.Args["id"].(int))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteAnimeRanking(rctx, fc.Args["id"].(int))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1432,63 +1415,6 @@ func (ec *executionContext) fieldContext_Query_GetAllUserInformation(ctx context
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_GetAllAnimeRanking(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_GetAllAnimeRanking(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetAllAnimeRanking(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.AnimeRanking)
-	fc.Result = res
-	return ec.marshalNAnimeRanking2ᚕᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeRankingᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_GetAllAnimeRanking(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "animeID":
-				return ec.fieldContext_AnimeRanking_animeID(ctx, field)
-			case "title":
-				return ec.fieldContext_AnimeRanking_title(ctx, field)
-			case "description":
-				return ec.fieldContext_AnimeRanking_description(ctx, field)
-			case "animeImageURL":
-				return ec.fieldContext_AnimeRanking_animeImageURL(ctx, field)
-			case "rank":
-				return ec.fieldContext_AnimeRanking_rank(ctx, field)
-			case "user":
-				return ec.fieldContext_AnimeRanking_user(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type AnimeRanking", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Query_user(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_user(ctx, field)
 	if err != nil {
@@ -1546,6 +1472,74 @@ func (ec *executionContext) fieldContext_Query_user(ctx context.Context, field g
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_user_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getAnimeRanking(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getAnimeRanking(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetAnimeRanking(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.AnimeRanking)
+	fc.Result = res
+	return ec.marshalNAnimeRanking2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeRanking(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getAnimeRanking(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "animeID":
+				return ec.fieldContext_AnimeRanking_animeID(ctx, field)
+			case "title":
+				return ec.fieldContext_AnimeRanking_title(ctx, field)
+			case "description":
+				return ec.fieldContext_AnimeRanking_description(ctx, field)
+			case "animeImageURL":
+				return ec.fieldContext_AnimeRanking_animeImageURL(ctx, field)
+			case "rank":
+				return ec.fieldContext_AnimeRanking_rank(ctx, field)
+			case "user":
+				return ec.fieldContext_AnimeRanking_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AnimeRanking", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getAnimeRanking_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -3983,12 +3977,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 				return ec._Mutation_registerUser(ctx, field)
 			})
 
-		case "getAnimeRanking":
-
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_getAnimeRanking(ctx, field)
-			})
-
 		case "createAnimeRanking":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -4059,26 +4047,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "GetAllAnimeRanking":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_GetAllAnimeRanking(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
 		case "user":
 			field := field
 
@@ -4089,6 +4057,26 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_user(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "getAnimeRanking":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getAnimeRanking(ctx, field)
 				return res
 			}
 
@@ -4492,50 +4480,6 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 func (ec *executionContext) marshalNAnimeRanking2githubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeRanking(ctx context.Context, sel ast.SelectionSet, v model.AnimeRanking) graphql.Marshaler {
 	return ec._AnimeRanking(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNAnimeRanking2ᚕᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeRankingᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AnimeRanking) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNAnimeRanking2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeRanking(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
 }
 
 func (ec *executionContext) marshalNAnimeRanking2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeRanking(ctx context.Context, sel ast.SelectionSet, v *model.AnimeRanking) graphql.Marshaler {

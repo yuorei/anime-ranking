@@ -11,7 +11,6 @@ type User {
 }
 
 type AnimeRanking {
-  # animeInformation:AnimeInformation! @goField(forceResolver: true)
   animeID: Int!
   title: String!
   description: String!
@@ -31,23 +30,17 @@ input NewAnimeRankingInput {
   description: String!
   rank: Int!
   animeImage: Upload!
-  # relatedAnime: [String]
 }
 
 type Query {
-  GetAllUserInformation: [User!]!# クエリ名allとかに変える
-  GetAllAnimeRanking: [AnimeRanking!]!# クエリ名allとかに変える
+  GetAllUserInformation: [User!]!
   user(id: Int!): User
-    # ランキングが持っているアニメの参照
-    # アニメが持っているユーザー
-    #
+  getAnimeRanking(id:Int!):AnimeRanking!
 }
 
 type Mutation {
   registerUser(input: UserInformationInput!): User!
-  # registerUserAnimeRanking(input: NewAnimeRankingInput!): AnimeRankingPayload!@auth
-  getAnimeRanking(id:Int!):AnimeRanking!
-  createAnimeRanking(userId: Int!, animeRanking: NewAnimeRankingInput!): AnimeRanking!
-  updateAnimeRanking(id: Int!, animeRanking: NewAnimeRankingInput!): AnimeRanking!
-  deleteAnimeRanking(id: Int!): Boolean!
+  createAnimeRanking(userId: Int!, animeRanking: NewAnimeRankingInput!): AnimeRanking!@auth
+  updateAnimeRanking(id: Int!, animeRanking: NewAnimeRankingInput!): AnimeRanking!@auth
+  deleteAnimeRanking(id: Int!): Boolean!@auth
 }

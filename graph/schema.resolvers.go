@@ -44,18 +44,6 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 	return userPayload, nil
 }
 
-// GetAnimeRanking is the resolver for the getAnimeRanking field.
-func (r *mutationResolver) GetAnimeRanking(ctx context.Context, id int) (*model.AnimeRanking, error) {
-	anime, err := mysql.GetAnimeRankingByID(id)
-	if err != nil {
-		return nil, err
-	}
-	result := &model.AnimeRanking{
-		Rank: anime.Rank,
-	}
-	return result, nil
-}
-
 // CreateAnimeRanking is the resolver for the createAnimeRanking field.
 func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, userID int, animeRanking model.NewAnimeRankingInput) (*model.AnimeRanking, error) {
 	customClaim := middlewares.CtxValue(ctx)
@@ -114,11 +102,6 @@ func (r *queryResolver) GetAllUserInformation(ctx context.Context) ([]*model.Use
 	return newUsers, nil
 }
 
-// GetAllAnimeRanking is the resolver for the GetAllAnimeRanking field.
-func (r *queryResolver) GetAllAnimeRanking(ctx context.Context) ([]*model.AnimeRanking, error) {
-	panic(fmt.Errorf("not implemented: GetAllAnimeRanking - GetAllAnimeRanking"))
-}
-
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, id int) (*model.User, error) {
 	tableUser, err := mysql.GetUserByID(id)
@@ -133,6 +116,18 @@ func (r *queryResolver) User(ctx context.Context, id int) (*model.User, error) {
 		HaveAnime:      nil,
 	}
 	return &user, nil
+}
+
+// GetAnimeRanking is the resolver for the getAnimeRanking field.
+func (r *queryResolver) GetAnimeRanking(ctx context.Context, id int) (*model.AnimeRanking, error) {
+	anime, err := mysql.GetAnimeRankingByID(id)
+	if err != nil {
+		return nil, err
+	}
+	result := &model.AnimeRanking{
+		Rank: anime.Rank,
+	}
+	return result, nil
 }
 
 // Mutation returns MutationResolver implementation.
