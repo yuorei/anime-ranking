@@ -7,20 +7,17 @@ type User {
   name: String!
   password:String!
   profieImageURL: String!
-  haveAnime:[AnimeRanking!] @goField(forceResolver: true)
+  haveAnime:[AnimeRanking!] #@goField(forceResolver: true)
 }
 
 type AnimeRanking {
-  animeInformation:AnimeInformation! @goField(forceResolver: true)
-  rank: Int!
-}
-
-type AnimeInformation {
+  # animeInformation:AnimeInformation! @goField(forceResolver: true)
   animeID: Int!
   title: String!
+  description: String!
   animeImageURL: String!
-  # relatedAnime: [AnimeInformation!] @goField(forceResolver: true)
-  registerUser: [User!] @goField(forceResolver: true)
+  rank: Int!
+  user: User!
 }
 
 type UserPayload{
@@ -28,13 +25,6 @@ type UserPayload{
   name: String!
   password: String!
   profieImageURL: String!
-}
-
-type AnimeRankingPayload{
- title: String!
- rank: Int!
- animeImageURL:String!
-#  relatedAnime: [String]
 }
 
 input UserInformationInput {
@@ -45,6 +35,7 @@ input UserInformationInput {
 
 input NewAnimeRankingInput {
   title: String!
+  description: String!
   rank: Int!
   animeImage: Upload!
   # relatedAnime: [String]
@@ -53,6 +44,7 @@ input NewAnimeRankingInput {
 type Query {
   GetAllUserInformation: [User!]!# クエリ名allとかに変える
   GetAllAnimeRanking: [AnimeRanking!]!# クエリ名allとかに変える
+  user(id: ID!): User
     # ランキングが持っているアニメの参照
     # アニメが持っているユーザー
     #
@@ -60,5 +52,9 @@ type Query {
 
 type Mutation {
   registerUser(input: UserInformationInput!): UserPayload!
-  registerUserAnimeRanking(input: NewAnimeRankingInput!): AnimeRankingPayload!@auth
+  # registerUserAnimeRanking(input: NewAnimeRankingInput!): AnimeRankingPayload!@auth
+  getAnimeRanking(id:Int!):AnimeRanking!
+  createAnimeRanking(userId: Int!, animeRanking: NewAnimeRankingInput!): AnimeRanking!
+  updateAnimeRanking(id: Int!, animeRanking: NewAnimeRankingInput!): AnimeRanking!
+  deleteAnimeRanking(id: Int!): Boolean!
 }
