@@ -44,7 +44,7 @@ input NewAnimeRankingInput {
 type Query {
   GetAllUserInformation: [User!]!# クエリ名allとかに変える
   GetAllAnimeRanking: [AnimeRanking!]!# クエリ名allとかに変える
-  user(id: ID!): User
+  user(id: Int!): User
     # ランキングが持っているアニメの参照
     # アニメが持っているユーザー
     #

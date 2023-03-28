@@ -119,8 +119,19 @@ func (r *queryResolver) GetAllAnimeRanking(ctx context.Context) ([]*model.AnimeR
 }
 
 // User is the resolver for the user field.
-func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+func (r *queryResolver) User(ctx context.Context, id int) (*model.User, error) {
+	tableUser, err := mysql.GetUserByID(id)
+	if err != nil {
+		return nil, err
+	}
+	user := model.User{
+		UserID:         int(tableUser.ID),
+		Name:           tableUser.Name,
+		Password:       tableUser.Password,
+		ProfieImageURL: tableUser.ProfieImageURL,
+		HaveAnime:      nil,
+	}
+	return &user, nil
 }
 
 // Mutation returns MutationResolver implementation.
