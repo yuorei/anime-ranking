@@ -40,7 +40,6 @@ type ResolverRoot interface {
 	AuthOps() AuthOpsResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
-	UserInformationInput() UserInformationInputResolver
 }
 
 type DirectiveRoot struct {
@@ -104,10 +103,6 @@ type QueryResolver interface {
 	GetAllUserInformation(ctx context.Context) ([]*model.User, error)
 	User(ctx context.Context, id int) (*model.User, error)
 	GetAnimeRanking(ctx context.Context, id int) (*model.AnimeRanking, error)
-}
-
-type UserInformationInputResolver interface {
-	Description(ctx context.Context, obj *model.UserInformationInput, data *string) error
 }
 
 type executableSchema struct {
@@ -3849,11 +3844,8 @@ func (ec *executionContext) unmarshalInputUserInformationInput(ctx context.Conte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Description, err = ec.unmarshalOString2string(ctx, v)
 			if err != nil {
-				return it, err
-			}
-			if err = ec.resolvers.UserInformationInput().Description(ctx, &it, data); err != nil {
 				return it, err
 			}
 		case "profieImage":

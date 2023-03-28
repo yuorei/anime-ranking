@@ -67,7 +67,7 @@ func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.N
 	}
 
 	return &model.AnimeRanking{
-		AnimeID:       anime.UserID,
+		AnimeID:       int(anime.ID),
 		Title:         anime.Title,
 		Rank:          anime.Rank,
 		Description:   &anime.Description,
@@ -133,22 +133,11 @@ func (r *queryResolver) GetAnimeRanking(ctx context.Context, id int) (*model.Ani
 	return result, nil
 }
 
-// Description is the resolver for the description field.
-func (r *userInformationInputResolver) Description(ctx context.Context, obj *model.UserInformationInput, data *string) error {
-	panic(fmt.Errorf("not implemented: Description - description"))
-}
-
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-// UserInformationInput returns UserInformationInputResolver implementation.
-func (r *Resolver) UserInformationInput() UserInformationInputResolver {
-	return &userInformationInputResolver{r}
-}
-
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-type userInformationInputResolver struct{ *Resolver }
