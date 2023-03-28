@@ -7,13 +7,14 @@ type User {
   name: String!
   password:String!
   profieImageURL: String!
+  description: String
   haveAnime:[AnimeRanking!] #@goField(forceResolver: true)
 }
 
 type AnimeRanking {
   animeID: Int!
   title: String!
-  description: String!
+  description: String
   animeImageURL: String!
   rank: Int!
   user: User!
@@ -22,12 +23,13 @@ type AnimeRanking {
 input UserInformationInput {
   name: String!
   password: String!
+  description: String
   profieImage: Upload!
 }
 
 input NewAnimeRankingInput {
   title: String!
-  description: String!
+  description: String
   rank: Int!
   animeImage: Upload!
 }
@@ -40,7 +42,7 @@ type Query {
 
 type Mutation {
   registerUser(input: UserInformationInput!): User!
-  createAnimeRanking(userId: Int!, animeRanking: NewAnimeRankingInput!): AnimeRanking!@auth
-  updateAnimeRanking(id: Int!, animeRanking: NewAnimeRankingInput!): AnimeRanking!@auth
+  createAnimeRanking(input: NewAnimeRankingInput!): AnimeRanking!@auth
+  updateAnimeRanking(id: Int!, input: NewAnimeRankingInput!): AnimeRanking!@auth
   deleteAnimeRanking(id: Int!): Boolean!@auth
 }
