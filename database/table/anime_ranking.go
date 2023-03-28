@@ -7,5 +7,6 @@ type AnimeRanking struct {
 	UserID        int    `gorm:"not null"`
 	Title         string `gorm:"not null"`
 	Rank          int    `gorm:"not null"`
+	Description   string
 	AnimeImageURL string `gorm:"not null"`
 }
