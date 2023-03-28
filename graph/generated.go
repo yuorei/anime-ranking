@@ -66,12 +66,12 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		Auth                 func(childComplexity int) int
-		CreateAnimeRanking   func(childComplexity int, userID int, animeRanking model.NewAnimeRankingInput) int
-		DeleteAnimeRanking   func(childComplexity int, id int) int
-		GetUserAnimeRankings func(childComplexity int, userID int) int
-		RegisterUser         func(childComplexity int, input model.UserInformationInput) int
-		UpdateAnimeRanking   func(childComplexity int, id int, animeRanking model.NewAnimeRankingInput) int
+		Auth               func(childComplexity int) int
+		CreateAnimeRanking func(childComplexity int, userID int, animeRanking model.NewAnimeRankingInput) int
+		DeleteAnimeRanking func(childComplexity int, id int) int
+		GetAnimeRanking    func(childComplexity int, id int) int
+		RegisterUser       func(childComplexity int, input model.UserInformationInput) int
+		UpdateAnimeRanking func(childComplexity int, id int, animeRanking model.NewAnimeRankingInput) int
 	}
 
 	Query struct {
@@ -101,7 +101,7 @@ type AuthOpsResolver interface {
 }
 type MutationResolver interface {
 	RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.UserPayload, error)
-	GetUserAnimeRankings(ctx context.Context, userID int) ([]*model.AnimeRanking, error)
+	GetAnimeRanking(ctx context.Context, id int) (*model.AnimeRanking, error)
 	CreateAnimeRanking(ctx context.Context, userID int, animeRanking model.NewAnimeRankingInput) (*model.AnimeRanking, error)
 	UpdateAnimeRanking(ctx context.Context, id int, animeRanking model.NewAnimeRankingInput) (*model.AnimeRanking, error)
 	DeleteAnimeRanking(ctx context.Context, id int) (bool, error)
@@ -227,17 +227,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteAnimeRanking(childComplexity, args["id"].(int)), true
 
-	case "Mutation.getUserAnimeRankings":
-		if e.complexity.Mutation.GetUserAnimeRankings == nil {
+	case "Mutation.getAnimeRanking":
+		if e.complexity.Mutation.GetAnimeRanking == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_getUserAnimeRankings_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_getAnimeRanking_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.GetUserAnimeRankings(childComplexity, args["userID"].(int)), true
+		return e.complexity.Mutation.GetAnimeRanking(childComplexity, args["id"].(int)), true
 
 	case "Mutation.registerUser":
 		if e.complexity.Mutation.RegisterUser == nil {
@@ -497,18 +497,18 @@ func (ec *executionContext) field_Mutation_deleteAnimeRanking_args(ctx context.C
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_getUserAnimeRankings_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_getAnimeRanking_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 int
-	if tmp, ok := rawArgs["userID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["userID"] = arg0
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -1105,8 +1105,8 @@ func (ec *executionContext) fieldContext_Mutation_registerUser(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_getUserAnimeRankings(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_getUserAnimeRankings(ctx, field)
+func (ec *executionContext) _Mutation_getAnimeRanking(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_getAnimeRanking(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1119,20 +1119,23 @@ func (ec *executionContext) _Mutation_getUserAnimeRankings(ctx context.Context, 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().GetUserAnimeRankings(rctx, fc.Args["userID"].(int))
+		return ec.resolvers.Mutation().GetAnimeRanking(rctx, fc.Args["id"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.AnimeRanking)
+	res := resTmp.(*model.AnimeRanking)
 	fc.Result = res
-	return ec.marshalOAnimeRanking2ᚕᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeRankingᚄ(ctx, field.Selections, res)
+	return ec.marshalNAnimeRanking2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐAnimeRanking(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_getUserAnimeRankings(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_getAnimeRanking(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -1163,7 +1166,7 @@ func (ec *executionContext) fieldContext_Mutation_getUserAnimeRankings(ctx conte
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_getUserAnimeRankings_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_getAnimeRanking_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -4189,10 +4192,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 				return ec._Mutation_registerUser(ctx, field)
 			})
 
-		case "getUserAnimeRankings":
+		case "getAnimeRanking":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_getUserAnimeRankings(ctx, field)
+				return ec._Mutation_getAnimeRanking(ctx, field)
 			})
 
 		case "createAnimeRanking":

@@ -53,7 +53,7 @@ type Query {
 type Mutation {
   registerUser(input: UserInformationInput!): UserPayload!
   # registerUserAnimeRanking(input: NewAnimeRankingInput!): AnimeRankingPayload!@auth
-  getUserAnimeRankings(userID:Int!):[AnimeRanking!]
+  getAnimeRanking(id:Int!):AnimeRanking!
   createAnimeRanking(userId: Int!, animeRanking: NewAnimeRankingInput!): AnimeRanking!
   updateAnimeRanking(id: Int!, animeRanking: NewAnimeRankingInput!): AnimeRanking!
   deleteAnimeRanking(id: Int!): Boolean!

@@ -43,9 +43,9 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 	return userPayload, nil
 }
 
-// GetUserAnimeRankings is the resolver for the getUserAnimeRankings field.
-func (r *mutationResolver) GetUserAnimeRankings(ctx context.Context, userID int) ([]*model.AnimeRanking, error) {
-	anime, err := mysql.GetAnimeRankinByUserID(userID)
+// GetAnimeRanking is the resolver for the getAnimeRanking field.
+func (r *mutationResolver) GetAnimeRanking(ctx context.Context, id int) (*model.AnimeRanking, error) {
+	anime, err := mysql.GetAnimeRankingByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -131,5 +131,3 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-
