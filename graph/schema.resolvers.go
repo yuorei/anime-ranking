@@ -128,7 +128,11 @@ func (r *queryResolver) GetAnimeRanking(ctx context.Context, id int) (*model.Ani
 		return nil, err
 	}
 	result := &model.AnimeRanking{
-		Rank: anime.Rank,
+		AnimeID:       int(anime.ID),
+		Title:         anime.Title,
+		Rank:          anime.Rank,
+		Description:   &anime.Description,
+		AnimeImageURL: anime.AnimeImageURL,
 	}
 	return result, nil
 }
