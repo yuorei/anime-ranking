@@ -56,7 +56,7 @@ func main() {
 		AllowedHeaders: []string{"Content-Type"},
 	})
 	router.PathPrefix("/query").Handler(corsOpts.Handler(srv))
-    router.PathPrefix("/").Handler(playground.Handler("GraphQL playground", "/query"))
+	router.PathPrefix("/").Handler(playground.Handler("GraphQL playground", "/query"))
 
 	// router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	// router.Handle("/query", srv)
