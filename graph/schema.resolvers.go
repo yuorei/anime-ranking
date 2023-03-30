@@ -112,33 +112,12 @@ func (r *queryResolver) User(ctx context.Context, id int) (*model.User, error) {
 		return nil, err
 	}
 
-	tableAnime, err := mysql.GetHaveAnimeByUserID(int(tableUser.ID))
-	if err != nil {
-		return nil, err
-	}
-
-	usersHaveAnime := make([]*model.AnimeRanking, len(tableAnime))
-	for i, v := range tableAnime {
-		description := new(string)
-		*description = v.Description
-		usersHaveAnime[i] = &model.AnimeRanking{
-			AnimeID:       int(v.ID),
-			Title:         v.Title,
-			Description:   description,
-			AnimeImageURL: v.AnimeImageURL,
-			Rank:          v.Rank,
-			User:          nil,
-		}
-	}
-
-	user := model.User{
+	return &model.User{
 		UserID:         int(tableUser.ID),
 		Name:           tableUser.Name,
 		Password:       tableUser.Password,
 		ProfieImageURL: tableUser.ProfieImageURL,
-		HaveAnime:      usersHaveAnime,
-	}
-	return &user, nil
+	}, nil
 }
 
 // GetAnimeRanking is the resolver for the getAnimeRanking field.
@@ -157,11 +136,39 @@ func (r *queryResolver) GetAnimeRanking(ctx context.Context, id int) (*model.Ani
 	return result, nil
 }
 
+// HaveAnime is the resolver for the haveAnime field.
+func (r *userResolver) HaveAnime(ctx context.Context, obj *model.User) ([]*model.AnimeRanking, error) {
+	tableAnime, err := mysql.GetHaveAnimeByUserID(int(obj.UserID))
+	if err != nil {
+		return nil, err
+	}
+
+	usersHaveAnime := make([]*model.AnimeRanking, len(tableAnime))
+	for i, v := range tableAnime {
+		description := new(string)
+		*description = v.Description
+		usersHaveAnime[i] = &model.AnimeRanking{
+			AnimeID:       int(v.ID),
+			Title:         v.Title,
+			Description:   description,
+			AnimeImageURL: v.AnimeImageURL,
+			Rank:          v.Rank,
+			User:          nil,
+		}
+	}
+
+	return usersHaveAnime, nil
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// User returns UserResolver implementation.
+func (r *Resolver) User() UserResolver { return &userResolver{r} }
+
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }

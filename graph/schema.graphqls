@@ -1,5 +1,3 @@
-# directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
-
 scalar Upload
 
 type User {
@@ -8,7 +6,7 @@ type User {
   password:String!
   profieImageURL: String!
   description: String
-  haveAnime:[AnimeRanking!] #@goField(forceResolver: true)
+  haveAnime:[AnimeRanking!] @goField(forceResolver: true)
 }
 
 type AnimeRanking {
