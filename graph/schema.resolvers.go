@@ -99,7 +99,6 @@ func (r *queryResolver) GetAllUserInformation(ctx context.Context) ([]*model.Use
 			Name:           user.Name,
 			Password:       user.Password,
 			ProfieImageURL: user.ProfieImageURL,
-			HaveAnime:      nil, // HaveAnimeフィールドは初期値をnilに設定
 		}
 	}
 	return newUsers, nil
