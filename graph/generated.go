@@ -40,6 +40,7 @@ type ResolverRoot interface {
 	AuthOps() AuthOpsResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
+	User() UserResolver
 }
 
 type DirectiveRoot struct {
@@ -103,6 +104,9 @@ type QueryResolver interface {
 	GetAllUserInformation(ctx context.Context) ([]*model.User, error)
 	User(ctx context.Context, id int) (*model.User, error)
 	GetAnimeRanking(ctx context.Context, id int) (*model.AnimeRanking, error)
+}
+type UserResolver interface {
+	HaveAnime(ctx context.Context, obj *model.User) ([]*model.AnimeRanking, error)
 }
 
 type executableSchema struct {
@@ -1908,7 +1912,7 @@ func (ec *executionContext) _User_haveAnime(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.HaveAnime, nil
+		return ec.resolvers.User().HaveAnime(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1926,8 +1930,8 @@ func (ec *executionContext) fieldContext_User_haveAnime(ctx context.Context, fie
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "animeID":
@@ -4172,37 +4176,50 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_userID(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "name":
 
 			out.Values[i] = ec._User_name(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "password":
 
 			out.Values[i] = ec._User_password(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "profieImageURL":
 
 			out.Values[i] = ec._User_profieImageURL(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "description":
 
 			out.Values[i] = ec._User_description(ctx, field, obj)
 
 		case "haveAnime":
+			field := field
 
-			out.Values[i] = ec._User_haveAnime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_haveAnime(ctx, field, obj)
+				return res
+			}
 
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
