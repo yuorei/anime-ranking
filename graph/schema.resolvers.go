@@ -111,12 +111,32 @@ func (r *queryResolver) User(ctx context.Context, id int) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	tableAnime, err := mysql.GetHaveAnimeByUserID(int(tableUser.ID))
+	if err != nil {
+		return nil, err
+	}
+
+	usersHaveAnime := make([]*model.AnimeRanking, len(tableAnime))
+	for i, v := range tableAnime {
+		description := new(string)
+		*description = v.Description
+		usersHaveAnime[i] = &model.AnimeRanking{
+			AnimeID:       int(v.ID),
+			Title:         v.Title,
+			Description:   description,
+			AnimeImageURL: v.AnimeImageURL,
+			Rank:          v.Rank,
+			User:          nil,
+		}
+	}
+
 	user := model.User{
 		UserID:         int(tableUser.ID),
 		Name:           tableUser.Name,
 		Password:       tableUser.Password,
 		ProfieImageURL: tableUser.ProfieImageURL,
-		HaveAnime:      nil,
+		HaveAnime:      usersHaveAnime,
 	}
 	return &user, nil
 }
