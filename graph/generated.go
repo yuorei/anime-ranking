@@ -61,6 +61,10 @@ type ComplexityRoot struct {
 		Login func(childComplexity int, input model.LoginInput) int
 	}
 
+	DeletePayload struct {
+		Success func(childComplexity int) int
+	}
+
 	LoginResponse struct {
 		Success func(childComplexity int) int
 		Token   func(childComplexity int) int
@@ -99,7 +103,7 @@ type MutationResolver interface {
 	UpdateUser(ctx context.Context, input model.UpdateUserInput) (*model.User, error)
 	CreateAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRanking, error)
 	UpdateAnimeRanking(ctx context.Context, animeID int, input model.UpdateAnimeRankingInput) (*model.AnimeRanking, error)
-	DeleteAnimeRanking(ctx context.Context, animeID int) (bool, error)
+	DeleteAnimeRanking(ctx context.Context, animeID int) (*model.DeletePayload, error)
 	Auth(ctx context.Context) (*model.AuthOps, error)
 }
 type QueryResolver interface {
@@ -179,6 +183,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AuthOps.Login(childComplexity, args["input"].(model.LoginInput)), true
+
+	case "DeletePayload.success":
+		if e.complexity.DeletePayload.Success == nil {
+			break
+		}
+
+		return e.complexity.DeletePayload.Success(childComplexity), true
 
 	case "LoginResponse.success":
 		if e.complexity.LoginResponse.Success == nil {
@@ -945,6 +956,50 @@ func (ec *executionContext) fieldContext_AuthOps_login(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _DeletePayload_success(ctx context.Context, field graphql.CollectedField, obj *model.DeletePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeletePayload_success(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Success, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeletePayload_success(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeletePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _LoginResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.LoginResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_LoginResponse_success(ctx, field)
 	if err != nil {
@@ -1373,10 +1428,10 @@ func (ec *executionContext) _Mutation_deleteAnimeRanking(ctx context.Context, fi
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(bool); ok {
+		if data, ok := tmp.(*model.DeletePayload); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/yuorei/anime-ranking/graph/model.DeletePayload`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1387,9 +1442,9 @@ func (ec *executionContext) _Mutation_deleteAnimeRanking(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*model.DeletePayload)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNDeletePayload2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐDeletePayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteAnimeRanking(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1399,7 +1454,11 @@ func (ec *executionContext) fieldContext_Mutation_deleteAnimeRanking(ctx context
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "success":
+				return ec.fieldContext_DeletePayload_success(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeletePayload", field.Name)
 		},
 	}
 	defer func() {
@@ -4170,6 +4229,34 @@ func (ec *executionContext) _AuthOps(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var deletePayloadImplementors = []string{"DeletePayload"}
+
+func (ec *executionContext) _DeletePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeletePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deletePayloadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeletePayload")
+		case "success":
+
+			out.Values[i] = ec._DeletePayload_success(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var loginResponseImplementors = []string{"LoginResponse"}
 
 func (ec *executionContext) _LoginResponse(ctx context.Context, sel ast.SelectionSet, obj *model.LoginResponse) graphql.Marshaler {
@@ -4791,6 +4878,20 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNDeletePayload2githubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐDeletePayload(ctx context.Context, sel ast.SelectionSet, v model.DeletePayload) graphql.Marshaler {
+	return ec._DeletePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeletePayload2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐDeletePayload(ctx context.Context, sel ast.SelectionSet, v *model.DeletePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeletePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {

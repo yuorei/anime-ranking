@@ -19,6 +19,10 @@ type AuthOps struct {
 	Login *LoginResponse `json:"login"`
 }
 
+type DeletePayload struct {
+	Success bool `json:"success"`
+}
+
 type UpdateUserInput struct {
 	Name        *string         `json:"name"`
 	Description *string         `json:"description"`
