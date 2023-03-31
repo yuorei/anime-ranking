@@ -39,6 +39,12 @@ input UpdateAnimeRankingInput {
   animeImage: Upload
 }
 
+input UpdateUserInput {
+  name: String
+  description: String
+  profieImage: Upload
+}
+
 type Query {
   GetAllUserInformation: [User!]!
   user(id: Int!): User
@@ -47,7 +53,8 @@ type Query {
 
 type Mutation {
   registerUser(input: UserInformationInput!): User!
+  updateUser(input:UpdateUserInput!):User!
   createAnimeRanking(input: NewAnimeRankingInput!): AnimeRanking!@auth
-  updateAnimeRanking(id: Int!, input: UpdateAnimeRankingInput!): AnimeRanking!@auth
-  deleteAnimeRanking(id: Int!): Boolean!@auth
+  updateAnimeRanking(animeID: Int!, input: UpdateAnimeRankingInput!): AnimeRanking!@auth
+  deleteAnimeRanking(animeID: Int!): Boolean!@auth
 }

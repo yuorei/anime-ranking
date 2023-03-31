@@ -44,6 +44,11 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 	return userPayload, nil
 }
 
+// UpdateUser is the resolver for the updateUser field.
+func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUserInput) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+}
+
 // CreateAnimeRanking is the resolver for the createAnimeRanking field.
 func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRanking, error) {
 	customClaim := middlewares.CtxValue(ctx)
@@ -76,9 +81,9 @@ func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.N
 }
 
 // UpdateAnimeRanking is the resolver for the updateAnimeRanking field.
-func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, id int, input model.UpdateAnimeRankingInput) (*model.AnimeRanking, error) {
+func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, animeID int, input model.UpdateAnimeRankingInput) (*model.AnimeRanking, error) {
 	customClaim := middlewares.CtxValue(ctx)
-	oldAnime, err := mysql.GetAnimeRankingByID(id)
+	oldAnime, err := mysql.GetAnimeRankingByID(animeID)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +110,7 @@ func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, id int, input
 		oldAnime.AnimeImageURL = result.Location
 	}
 
-	newAnime, err := mysql.UpdateAnimeRanking(id, oldAnime)
+	newAnime, err := mysql.UpdateAnimeRanking(animeID, oldAnime)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +126,7 @@ func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, id int, input
 }
 
 // DeleteAnimeRanking is the resolver for the deleteAnimeRanking field.
-func (r *mutationResolver) DeleteAnimeRanking(ctx context.Context, id int) (bool, error) {
+func (r *mutationResolver) DeleteAnimeRanking(ctx context.Context, animeID int) (bool, error) {
 	panic(fmt.Errorf("not implemented: DeleteAnimeRanking - deleteAnimeRanking"))
 }
 
