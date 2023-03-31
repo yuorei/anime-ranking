@@ -76,8 +76,48 @@ func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.N
 }
 
 // UpdateAnimeRanking is the resolver for the updateAnimeRanking field.
-func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, id int, input model.NewAnimeRankingInput) (*model.AnimeRanking, error) {
-	panic(fmt.Errorf("not implemented: UpdateAnimeRanking - updateAnimeRanking"))
+func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, id int, input model.UpdateAnimeRankingInput) (*model.AnimeRanking, error) {
+	customClaim := middlewares.CtxValue(ctx)
+	oldAnime, err := mysql.GetAnimeRankingByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if oldAnime.UserID != customClaim.ID {
+		return nil, fmt.Errorf("userIDが違います")
+	}
+
+	if input.Title != nil {
+		oldAnime.Title = *input.Title
+	}
+	if input.Rank != nil {
+		oldAnime.Rank = *input.Rank
+	}
+	if input.Description != nil {
+		oldAnime.Description = *input.Description
+	}
+
+	if input.AnimeImage != nil {
+		result, err := application.AWSS3Upload(input.AnimeImage.File, input.AnimeImage.Filename)
+		if err != nil {
+			return nil, err
+		}
+		oldAnime.AnimeImageURL = result.Location
+	}
+
+	newAnime, err := mysql.UpdateAnimeRanking(id, oldAnime)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.AnimeRanking{
+		AnimeID:       int(newAnime.ID),
+		Title:         newAnime.Title,
+		Description:   &newAnime.Description,
+		AnimeImageURL: newAnime.AnimeImageURL,
+		Rank:          newAnime.Rank,
+		User:          nil,
+	}, nil
 }
 
 // DeleteAnimeRanking is the resolver for the deleteAnimeRanking field.
