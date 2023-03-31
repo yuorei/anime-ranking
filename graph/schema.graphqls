@@ -61,4 +61,5 @@ type Mutation {
   createAnimeRanking(input: NewAnimeRankingInput!): AnimeRanking!@auth
   updateAnimeRanking(animeID: Int!, input: UpdateAnimeRankingInput!): AnimeRanking!@auth
   deleteAnimeRanking(animeID: Int!): DeletePayload!@auth
+  deleteUser: DeletePayload!@auth
 }

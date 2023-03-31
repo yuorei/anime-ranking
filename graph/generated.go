@@ -74,6 +74,7 @@ type ComplexityRoot struct {
 		Auth               func(childComplexity int) int
 		CreateAnimeRanking func(childComplexity int, input model.NewAnimeRankingInput) int
 		DeleteAnimeRanking func(childComplexity int, animeID int) int
+		DeleteUser         func(childComplexity int) int
 		RegisterUser       func(childComplexity int, input model.UserInformationInput) int
 		UpdateAnimeRanking func(childComplexity int, animeID int, input model.UpdateAnimeRankingInput) int
 		UpdateUser         func(childComplexity int, input model.UpdateUserInput) int
@@ -104,6 +105,7 @@ type MutationResolver interface {
 	CreateAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRanking, error)
 	UpdateAnimeRanking(ctx context.Context, animeID int, input model.UpdateAnimeRankingInput) (*model.AnimeRanking, error)
 	DeleteAnimeRanking(ctx context.Context, animeID int) (*model.DeletePayload, error)
+	DeleteUser(ctx context.Context) (*model.DeletePayload, error)
 	Auth(ctx context.Context) (*model.AuthOps, error)
 }
 type QueryResolver interface {
@@ -235,6 +237,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteAnimeRanking(childComplexity, args["animeID"].(int)), true
+
+	case "Mutation.deleteUser":
+		if e.complexity.Mutation.DeleteUser == nil {
+			break
+		}
+
+		return e.complexity.Mutation.DeleteUser(childComplexity), true
 
 	case "Mutation.registerUser":
 		if e.complexity.Mutation.RegisterUser == nil {
@@ -1471,6 +1480,73 @@ func (ec *executionContext) fieldContext_Mutation_deleteAnimeRanking(ctx context
 	if fc.Args, err = ec.field_Mutation_deleteAnimeRanking_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteUser(rctx)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeletePayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/yuorei/anime-ranking/graph/model.DeletePayload`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeletePayload)
+	fc.Result = res
+	return ec.marshalNDeletePayload2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐDeletePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "success":
+				return ec.fieldContext_DeletePayload_success(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeletePayload", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -4335,6 +4411,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteAnimeRanking(ctx, field)
+			})
+
+		case "deleteUser":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteUser(ctx, field)
 			})
 
 		case "auth":

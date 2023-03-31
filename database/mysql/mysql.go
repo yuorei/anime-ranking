@@ -121,3 +121,10 @@ func DeleteAnimeRanking(anime table.AnimeRanking) (bool, error) {
 	}
 	return true, nil
 }
+
+func DeleteUser(user table.User)(bool, error){
+	if err := db.Conn.Delete(&user).Error; err != nil {
+		return false, err
+	}
+	return true, nil
+}

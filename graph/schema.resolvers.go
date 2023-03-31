@@ -183,6 +183,27 @@ func (r *mutationResolver) DeleteAnimeRanking(ctx context.Context, animeID int) 
 	}, nil
 }
 
+// DeleteUser is the resolver for the deleteUser field.
+func (r *mutationResolver) DeleteUser(ctx context.Context) (*model.DeletePayload, error) {
+	customClaim := middlewares.CtxValue(ctx)
+	user, err := mysql.GetUserByID(customClaim.ID)
+	if err != nil {
+		return &model.DeletePayload{
+			Success: false,
+		}, err
+	}
+	result, err := mysql.DeleteUser(user)
+	if err != nil || result == false {
+		return &model.DeletePayload{
+			Success: false,
+		}, err
+	}
+
+	return &model.DeletePayload{
+		Success: true,
+	}, nil
+}
+
 // GetAllUserInformation is the resolver for the GetAllUserInformation field.
 func (r *queryResolver) GetAllUserInformation(ctx context.Context) ([]*model.User, error) {
 	users, err := mysql.GetAllUsers()
