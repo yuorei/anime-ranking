@@ -192,13 +192,20 @@ func (r *mutationResolver) DeleteUser(ctx context.Context) (*model.DeletePayload
 			Success: false,
 		}, err
 	}
-	result, err := mysql.DeleteUser(user)
-	if err != nil || result {
+
+	err = mysql.DeleteUser(user)
+	if err != nil {
 		return &model.DeletePayload{
 			Success: false,
 		}, err
 	}
 
+	err = mysql.DeleteUserAllAnimeRanking(int(user.ID))
+	if err != nil {
+		return &model.DeletePayload{
+			Success: false,
+		}, err
+	}
 	return &model.DeletePayload{
 		Success: true,
 	}, nil
