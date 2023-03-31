@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/yuorei/anime-ranking/database/table"
 	"gorm.io/driver/mysql"
@@ -96,4 +97,12 @@ func GetHaveAnimeByUserID(id int) ([]table.AnimeRanking, error) {
 		return animes, err
 	}
 	return animes, nil
+}
+
+func UpdateAnimeRanking(id int, anime table.AnimeRanking) (table.AnimeRanking, error) {
+	anime.UpdatedAt = time.Now()
+	if err := db.Conn.Save(&anime).Error; err != nil {
+		return anime, err
+	}
+	return anime, nil
 }

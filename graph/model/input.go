@@ -15,3 +15,10 @@ type UserInformationInput struct {
 	Description string         `json:"description"`
 	ProfieImage graphql.Upload `json:"profieImage"`
 }
+
+type UpdateAnimeRankingInput struct {
+	Title       *string         `json:"title"`
+	Description *string         `json:"description"`
+	Rank        *int            `json:"rank"`
+	AnimeImage  *graphql.Upload `json:"animeImage"`
+}

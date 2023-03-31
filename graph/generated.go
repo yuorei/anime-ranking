@@ -71,7 +71,7 @@ type ComplexityRoot struct {
 		CreateAnimeRanking func(childComplexity int, input model.NewAnimeRankingInput) int
 		DeleteAnimeRanking func(childComplexity int, id int) int
 		RegisterUser       func(childComplexity int, input model.UserInformationInput) int
-		UpdateAnimeRanking func(childComplexity int, id int, input model.NewAnimeRankingInput) int
+		UpdateAnimeRanking func(childComplexity int, id int, input model.UpdateAnimeRankingInput) int
 	}
 
 	Query struct {
@@ -96,7 +96,7 @@ type AuthOpsResolver interface {
 type MutationResolver interface {
 	RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.User, error)
 	CreateAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRanking, error)
-	UpdateAnimeRanking(ctx context.Context, id int, input model.NewAnimeRankingInput) (*model.AnimeRanking, error)
+	UpdateAnimeRanking(ctx context.Context, id int, input model.UpdateAnimeRankingInput) (*model.AnimeRanking, error)
 	DeleteAnimeRanking(ctx context.Context, id int) (bool, error)
 	Auth(ctx context.Context) (*model.AuthOps, error)
 }
@@ -245,7 +245,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateAnimeRanking(childComplexity, args["id"].(int), args["input"].(model.NewAnimeRankingInput)), true
+		return e.complexity.Mutation.UpdateAnimeRanking(childComplexity, args["id"].(int), args["input"].(model.UpdateAnimeRankingInput)), true
 
 	case "Query.GetAllUserInformation":
 		if e.complexity.Query.GetAllUserInformation == nil {
@@ -330,6 +330,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputLoginInput,
 		ec.unmarshalInputNewAnimeRankingInput,
+		ec.unmarshalInputUpdateAnimeRankingInput,
 		ec.unmarshalInputUserInformationInput,
 	)
 	first := true
@@ -483,10 +484,10 @@ func (ec *executionContext) field_Mutation_updateAnimeRanking_args(ctx context.C
 		}
 	}
 	args["id"] = arg0
-	var arg1 model.NewAnimeRankingInput
+	var arg1 model.UpdateAnimeRankingInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNNewAnimeRankingInput2githubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐNewAnimeRankingInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateAnimeRankingInput2githubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐUpdateAnimeRankingInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1170,7 +1171,7 @@ func (ec *executionContext) _Mutation_updateAnimeRanking(ctx context.Context, fi
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().UpdateAnimeRanking(rctx, fc.Args["id"].(int), fc.Args["input"].(model.NewAnimeRankingInput))
+			return ec.resolvers.Mutation().UpdateAnimeRanking(rctx, fc.Args["id"].(int), fc.Args["input"].(model.UpdateAnimeRankingInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -3814,6 +3815,58 @@ func (ec *executionContext) unmarshalInputNewAnimeRankingInput(ctx context.Conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateAnimeRankingInput(ctx context.Context, obj interface{}) (model.UpdateAnimeRankingInput, error) {
+	var it model.UpdateAnimeRankingInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"title", "description", "rank", "animeImage"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "title":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "rank":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rank"))
+			it.Rank, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "animeImage":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("animeImage"))
+			it.AnimeImage, err = ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUserInformationInput(ctx context.Context, obj interface{}) (model.UserInformationInput, error) {
 	var it model.UserInformationInput
 	asMap := map[string]interface{}{}
@@ -4646,6 +4699,11 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
+func (ec *executionContext) unmarshalNUpdateAnimeRankingInput2githubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐUpdateAnimeRankingInput(ctx context.Context, v interface{}) (model.UpdateAnimeRankingInput, error) {
+	res, err := ec.unmarshalInputUpdateAnimeRankingInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (graphql.Upload, error) {
 	res, err := graphql.UnmarshalUpload(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5050,6 +5108,22 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
+	return res
+}
+
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5073,6 +5147,22 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	res := graphql.MarshalString(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (*graphql.Upload, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalUpload(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v *graphql.Upload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalUpload(*v)
 	return res
 }
 
