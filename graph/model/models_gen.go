@@ -2,6 +2,10 @@
 
 package model
 
+import (
+	"github.com/99designs/gqlgen/graphql"
+)
+
 type AnimeRanking struct {
 	AnimeID       int     `json:"animeID"`
 	Title         string  `json:"title"`
@@ -13,6 +17,12 @@ type AnimeRanking struct {
 
 type AuthOps struct {
 	Login *LoginResponse `json:"login"`
+}
+
+type UpdateUserInput struct {
+	Name        *string         `json:"name"`
+	Description *string         `json:"description"`
+	ProfieImage *graphql.Upload `json:"profieImage"`
 }
 
 type User struct {

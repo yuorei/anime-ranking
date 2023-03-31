@@ -69,9 +69,10 @@ type ComplexityRoot struct {
 	Mutation struct {
 		Auth               func(childComplexity int) int
 		CreateAnimeRanking func(childComplexity int, input model.NewAnimeRankingInput) int
-		DeleteAnimeRanking func(childComplexity int, id int) int
+		DeleteAnimeRanking func(childComplexity int, animeID int) int
 		RegisterUser       func(childComplexity int, input model.UserInformationInput) int
-		UpdateAnimeRanking func(childComplexity int, id int, input model.UpdateAnimeRankingInput) int
+		UpdateAnimeRanking func(childComplexity int, animeID int, input model.UpdateAnimeRankingInput) int
+		UpdateUser         func(childComplexity int, input model.UpdateUserInput) int
 	}
 
 	Query struct {
@@ -95,9 +96,10 @@ type AuthOpsResolver interface {
 }
 type MutationResolver interface {
 	RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.User, error)
+	UpdateUser(ctx context.Context, input model.UpdateUserInput) (*model.User, error)
 	CreateAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRanking, error)
-	UpdateAnimeRanking(ctx context.Context, id int, input model.UpdateAnimeRankingInput) (*model.AnimeRanking, error)
-	DeleteAnimeRanking(ctx context.Context, id int) (bool, error)
+	UpdateAnimeRanking(ctx context.Context, animeID int, input model.UpdateAnimeRankingInput) (*model.AnimeRanking, error)
+	DeleteAnimeRanking(ctx context.Context, animeID int) (bool, error)
 	Auth(ctx context.Context) (*model.AuthOps, error)
 }
 type QueryResolver interface {
@@ -221,7 +223,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteAnimeRanking(childComplexity, args["id"].(int)), true
+		return e.complexity.Mutation.DeleteAnimeRanking(childComplexity, args["animeID"].(int)), true
 
 	case "Mutation.registerUser":
 		if e.complexity.Mutation.RegisterUser == nil {
@@ -245,7 +247,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateAnimeRanking(childComplexity, args["id"].(int), args["input"].(model.UpdateAnimeRankingInput)), true
+		return e.complexity.Mutation.UpdateAnimeRanking(childComplexity, args["animeID"].(int), args["input"].(model.UpdateAnimeRankingInput)), true
+
+	case "Mutation.updateUser":
+		if e.complexity.Mutation.UpdateUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateUser(childComplexity, args["input"].(model.UpdateUserInput)), true
 
 	case "Query.GetAllUserInformation":
 		if e.complexity.Query.GetAllUserInformation == nil {
@@ -331,6 +345,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputLoginInput,
 		ec.unmarshalInputNewAnimeRankingInput,
 		ec.unmarshalInputUpdateAnimeRankingInput,
+		ec.unmarshalInputUpdateUserInput,
 		ec.unmarshalInputUserInformationInput,
 	)
 	first := true
@@ -446,14 +461,14 @@ func (ec *executionContext) field_Mutation_deleteAnimeRanking_args(ctx context.C
 	var err error
 	args := map[string]interface{}{}
 	var arg0 int
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["animeID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("animeID"))
 		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["id"] = arg0
+	args["animeID"] = arg0
 	return args, nil
 }
 
@@ -476,14 +491,14 @@ func (ec *executionContext) field_Mutation_updateAnimeRanking_args(ctx context.C
 	var err error
 	args := map[string]interface{}{}
 	var arg0 int
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["animeID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("animeID"))
 		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["id"] = arg0
+	args["animeID"] = arg0
 	var arg1 model.UpdateAnimeRankingInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
@@ -493,6 +508,21 @@ func (ec *executionContext) field_Mutation_updateAnimeRanking_args(ctx context.C
 		}
 	}
 	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateUserInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateUserInput2githubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐUpdateUserInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -1068,6 +1098,74 @@ func (ec *executionContext) fieldContext_Mutation_registerUser(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateUser(rctx, fc.Args["input"].(model.UpdateUserInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "userID":
+				return ec.fieldContext_User_userID(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "profieImageURL":
+				return ec.fieldContext_User_profieImageURL(ctx, field)
+			case "description":
+				return ec.fieldContext_User_description(ctx, field)
+			case "haveAnime":
+				return ec.fieldContext_User_haveAnime(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createAnimeRanking(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createAnimeRanking(ctx, field)
 	if err != nil {
@@ -1171,7 +1269,7 @@ func (ec *executionContext) _Mutation_updateAnimeRanking(ctx context.Context, fi
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().UpdateAnimeRanking(rctx, fc.Args["id"].(int), fc.Args["input"].(model.UpdateAnimeRankingInput))
+			return ec.resolvers.Mutation().UpdateAnimeRanking(rctx, fc.Args["animeID"].(int), fc.Args["input"].(model.UpdateAnimeRankingInput))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -1259,7 +1357,7 @@ func (ec *executionContext) _Mutation_deleteAnimeRanking(ctx context.Context, fi
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().DeleteAnimeRanking(rctx, fc.Args["id"].(int))
+			return ec.resolvers.Mutation().DeleteAnimeRanking(rctx, fc.Args["animeID"].(int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Auth == nil {
@@ -3867,6 +3965,50 @@ func (ec *executionContext) unmarshalInputUpdateAnimeRankingInput(ctx context.Co
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, obj interface{}) (model.UpdateUserInput, error) {
+	var it model.UpdateUserInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "description", "profieImage"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "profieImage":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("profieImage"))
+			it.ProfieImage, err = ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUserInformationInput(ctx context.Context, obj interface{}) (model.UserInformationInput, error) {
 	var it model.UserInformationInput
 	asMap := map[string]interface{}{}
@@ -4082,6 +4224,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_registerUser(ctx, field)
+			})
+
+		case "updateUser":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUser(ctx, field)
 			})
 
 		case "createAnimeRanking":
@@ -4701,6 +4849,11 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 
 func (ec *executionContext) unmarshalNUpdateAnimeRankingInput2githubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐUpdateAnimeRankingInput(ctx context.Context, v interface{}) (model.UpdateAnimeRankingInput, error) {
 	res, err := ec.unmarshalInputUpdateAnimeRankingInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateUserInput2githubᚗcomᚋyuoreiᚋanimeᚑrankingᚋgraphᚋmodelᚐUpdateUserInput(ctx context.Context, v interface{}) (model.UpdateUserInput, error) {
+	res, err := ec.unmarshalInputUpdateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
