@@ -160,26 +160,26 @@ func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, animeID int, 
 // DeleteAnimeRanking is the resolver for the deleteAnimeRanking field.
 func (r *mutationResolver) DeleteAnimeRanking(ctx context.Context, animeID int) (*model.DeletePayload, error) {
 	customClaim := middlewares.CtxValue(ctx)
-	oldAnime, err := mysql.GetAnimeRankingByID(animeID)
+	anime, err := mysql.GetAnimeRankingByID(animeID)
 	if err != nil {
 		return &model.DeletePayload{
 			Success: false,
 		}, err
 	}
 
-	if oldAnime.UserID != customClaim.ID {
+	if anime.UserID != customClaim.ID {
 		return &model.DeletePayload{
 			Success: false,
 		}, fmt.Errorf("userIDが違います")
 	}
-	delete, err := mysql.DeleteAnimeRanking(oldAnime)
-	if err != nil {
+	delete, err := mysql.DeleteAnimeRanking(anime)
+	if err != nil || delete {
 		return &model.DeletePayload{
-			Success: delete,
+			Success: false,
 		}, err
 	}
 	return &model.DeletePayload{
-		Success: delete,
+		Success: true,
 	}, nil
 }
 
@@ -193,7 +193,7 @@ func (r *mutationResolver) DeleteUser(ctx context.Context) (*model.DeletePayload
 		}, err
 	}
 	result, err := mysql.DeleteUser(user)
-	if err != nil || result == false {
+	if err != nil || result {
 		return &model.DeletePayload{
 			Success: false,
 		}, err
