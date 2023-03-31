@@ -46,7 +46,39 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUserInput) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+	customClaim := middlewares.CtxValue(ctx)
+	oldUser, err := mysql.GetUserByID(customClaim.ID)
+	if err != nil {
+		return nil, err
+	}
+	if input.Name != nil {
+		oldUser.Name = *input.Name
+	}
+	if input.Description != nil {
+		oldUser.Description = *input.Description
+	}
+
+	if input.ProfieImage != nil {
+		result, err := application.AWSS3Upload(input.ProfieImage.File, input.ProfieImage.Filename)
+		if err != nil {
+			return nil, err
+		}
+		oldUser.ProfieImageURL = result.Location
+	}
+
+	newUser, err := mysql.UpdateUser(oldUser)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.User{
+		UserID:         int(newUser.ID),
+		Name:           newUser.Name,
+		Password:       newUser.Password,
+		ProfieImageURL: newUser.ProfieImageURL,
+		Description:    &newUser.Description,
+		HaveAnime:      nil,
+	}, nil
 }
 
 // CreateAnimeRanking is the resolver for the createAnimeRanking field.

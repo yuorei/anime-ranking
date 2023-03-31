@@ -106,3 +106,11 @@ func UpdateAnimeRanking(id int, anime table.AnimeRanking) (table.AnimeRanking, e
 	}
 	return anime, nil
 }
+
+func UpdateUser(user table.User) (table.User, error) {
+	user.UpdatedAt = time.Now()
+	if err := db.Conn.Save(&user).Error; err != nil {
+		return user, err
+	}
+	return user, nil
+}
