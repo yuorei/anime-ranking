@@ -35,13 +35,6 @@ func main() {
 		port = defaultPort
 	}
 
-	// srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
-
-	// // リクエストの認証に必要なJWTトークンの検証を行うauthMiddleware関数を追加する
-	// srv.Use(middlewares.AuthMiddleware)
-	// http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	// http.Handle("/query", srv)
-
 	router := mux.NewRouter()
 	router.Use(middlewares.AuthMiddleware)
 
@@ -57,9 +50,6 @@ func main() {
 	})
 	router.PathPrefix("/query").Handler(corsOpts.Handler(srv))
 	router.PathPrefix("/").Handler(playground.Handler("GraphQL playground", "/query"))
-
-	// router.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	// router.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, router))
