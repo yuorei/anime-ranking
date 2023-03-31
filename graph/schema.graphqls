@@ -45,6 +45,10 @@ input UpdateUserInput {
   profieImage: Upload
 }
 
+type DeletePayload{
+  success: Boolean!
+}
+
 type Query {
   GetAllUserInformation: [User!]!
   user(id: Int!): User
@@ -56,5 +60,6 @@ type Mutation {
   updateUser(input:UpdateUserInput!):User!
   createAnimeRanking(input: NewAnimeRankingInput!): AnimeRanking!@auth
   updateAnimeRanking(animeID: Int!, input: UpdateAnimeRankingInput!): AnimeRanking!@auth
-  deleteAnimeRanking(animeID: Int!): Boolean!@auth
+  deleteAnimeRanking(animeID: Int!): DeletePayload!@auth
+  deleteUser: DeletePayload!@auth
 }

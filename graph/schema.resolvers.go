@@ -158,8 +158,57 @@ func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, animeID int, 
 }
 
 // DeleteAnimeRanking is the resolver for the deleteAnimeRanking field.
-func (r *mutationResolver) DeleteAnimeRanking(ctx context.Context, animeID int) (bool, error) {
-	panic(fmt.Errorf("not implemented: DeleteAnimeRanking - deleteAnimeRanking"))
+func (r *mutationResolver) DeleteAnimeRanking(ctx context.Context, animeID int) (*model.DeletePayload, error) {
+	customClaim := middlewares.CtxValue(ctx)
+	anime, err := mysql.GetAnimeRankingByID(animeID)
+	if err != nil {
+		return &model.DeletePayload{
+			Success: false,
+		}, err
+	}
+
+	if anime.UserID != customClaim.ID {
+		return &model.DeletePayload{
+			Success: false,
+		}, fmt.Errorf("userIDが違います")
+	}
+	delete, err := mysql.DeleteAnimeRanking(anime)
+	if err != nil || delete {
+		return &model.DeletePayload{
+			Success: false,
+		}, err
+	}
+	return &model.DeletePayload{
+		Success: true,
+	}, nil
+}
+
+// DeleteUser is the resolver for the deleteUser field.
+func (r *mutationResolver) DeleteUser(ctx context.Context) (*model.DeletePayload, error) {
+	customClaim := middlewares.CtxValue(ctx)
+	user, err := mysql.GetUserByID(customClaim.ID)
+	if err != nil {
+		return &model.DeletePayload{
+			Success: false,
+		}, err
+	}
+
+	err = mysql.DeleteUser(user)
+	if err != nil {
+		return &model.DeletePayload{
+			Success: false,
+		}, err
+	}
+
+	err = mysql.DeleteUserAllAnimeRanking(int(user.ID))
+	if err != nil {
+		return &model.DeletePayload{
+			Success: false,
+		}, err
+	}
+	return &model.DeletePayload{
+		Success: true,
+	}, nil
 }
 
 // GetAllUserInformation is the resolver for the GetAllUserInformation field.

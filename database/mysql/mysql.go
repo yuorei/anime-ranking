@@ -114,3 +114,25 @@ func UpdateUser(user table.User) (table.User, error) {
 	}
 	return user, nil
 }
+
+func DeleteAnimeRanking(anime table.AnimeRanking) (bool, error) {
+	if err := db.Conn.Delete(&anime).Error; err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func DeleteUser(user table.User) error {
+	if err := db.Conn.Delete(&user).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func DeleteUserAllAnimeRanking(id int) error {
+	var anime table.AnimeRanking
+	if err := db.Conn.Where("user_id = ?", id).Delete(&anime).Error; err != nil {
+		return err
+	}
+	return nil
+}
