@@ -77,11 +77,16 @@ func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.N
 
 // UpdateAnimeRanking is the resolver for the updateAnimeRanking field.
 func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, id int, input model.UpdateAnimeRankingInput) (*model.AnimeRanking, error) {
-	// customClaim := middlewares.CtxValue(ctx)
+	customClaim := middlewares.CtxValue(ctx)
 	oldAnime, err := mysql.GetAnimeRankingByID(id)
 	if err != nil {
 		return nil, err
 	}
+
+	if oldAnime.UserID != customClaim.ID {
+		return nil, fmt.Errorf("userIDが違います")
+	}
+
 	if input.Title != nil {
 		oldAnime.Title = *input.Title
 	}
