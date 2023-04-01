@@ -14,8 +14,8 @@ import (
 
 	"github.com/yuorei/anime-ranking/database/mysql"
 	"github.com/yuorei/anime-ranking/directives"
-	"github.com/yuorei/anime-ranking/graph"
 	"github.com/yuorei/anime-ranking/graph/generated"
+	"github.com/yuorei/anime-ranking/graph/resolver"
 	"github.com/yuorei/anime-ranking/middlewares"
 )
 
@@ -39,7 +39,7 @@ func main() {
 	router := mux.NewRouter()
 	router.Use(middlewares.AuthMiddleware)
 
-	c := generated.Config{Resolvers: &graph.Resolver{}}
+	c := generated.Config{Resolvers: &resolver.Resolver{}}
 	c.Directives.Auth = directives.Auth
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(c))
