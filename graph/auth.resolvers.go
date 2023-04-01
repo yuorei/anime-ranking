@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 
+	"github.com/yuorei/anime-ranking/graph/generated"
 	"github.com/yuorei/anime-ranking/graph/model"
 	"github.com/yuorei/anime-ranking/service"
 )
@@ -39,7 +40,7 @@ func (r *mutationResolver) Auth(ctx context.Context) (*model.AuthOps, error) {
 	return &model.AuthOps{}, nil
 }
 
-// AuthOps returns AuthOpsResolver implementation.
-func (r *Resolver) AuthOps() AuthOpsResolver { return &authOpsResolver{r} }
+// AuthOps returns generated.AuthOpsResolver implementation.
+func (r *Resolver) AuthOps() generated.AuthOpsResolver { return &authOpsResolver{r} }
 
 type authOpsResolver struct{ *Resolver }

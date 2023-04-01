@@ -15,6 +15,7 @@ import (
 	"github.com/yuorei/anime-ranking/database/mysql"
 	"github.com/yuorei/anime-ranking/directives"
 	"github.com/yuorei/anime-ranking/graph"
+	"github.com/yuorei/anime-ranking/graph/generated"
 	"github.com/yuorei/anime-ranking/middlewares"
 )
 
@@ -38,10 +39,10 @@ func main() {
 	router := mux.NewRouter()
 	router.Use(middlewares.AuthMiddleware)
 
-	c := graph.Config{Resolvers: &graph.Resolver{}}
+	c := generated.Config{Resolvers: &graph.Resolver{}}
 	c.Directives.Auth = directives.Auth
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(c))
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(c))
 	// CORSの設定
 	corsOpts := cors.New(cors.Options{
 		AllowedOrigins: []string{"http://localhost:3000"}, // 許可するOriginを指定
