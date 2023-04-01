@@ -9,3 +9,7 @@ type LoginResponse struct {
 	Success bool    `json:"success"`
 	Token   *string `json:"token"`
 }
+
+type AuthOps struct {
+	Login *LoginResponse `json:"login"`
+}

@@ -9,27 +9,11 @@ type User {
   haveAnime:[AnimeRanking!] @goField(forceResolver: true)
 }
 
-type AnimeRanking {
-  animeID: Int!
-  title: String!
-  description: String
-  animeImageURL: String!
-  rank: Int!
-  user: User!
-}
-
 input UserInformationInput {
   name: String!
   password: String!
   description: String
   profieImage: Upload!
-}
-
-input NewAnimeRankingInput {
-  title: String!
-  description: String
-  rank: Int!
-  animeImage: Upload!
 }
 
 input UpdateAnimeRankingInput {
@@ -52,14 +36,10 @@ type DeletePayload{
 type Query {
   GetAllUserInformation: [User!]!
   user(id: Int!): User
-  getAnimeRanking(id:Int!):AnimeRanking!
 }
 
 type Mutation {
   registerUser(input: UserInformationInput!): User!
   updateUser(input:UpdateUserInput!):User!
-  createAnimeRanking(input: NewAnimeRankingInput!): AnimeRanking!@auth
-  updateAnimeRanking(animeID: Int!, input: UpdateAnimeRankingInput!): AnimeRanking!@auth
-  deleteAnimeRanking(animeID: Int!): DeletePayload!@auth
   deleteUser: DeletePayload!@auth
 }
