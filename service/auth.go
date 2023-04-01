@@ -16,8 +16,9 @@ func GetUserByName(name string) (table.User, error) {
 
 // Check if the password is correct
 func VerifyPassword(userPassword, inputPassword string) bool {
-	if userPassword == inputPassword {
-		return true
+	if ComparePassword(userPassword, inputPassword) != nil {
+		return false
 	}
-	return false
+
+	return true
 }
