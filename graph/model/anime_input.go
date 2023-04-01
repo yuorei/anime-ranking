@@ -8,14 +8,6 @@ type NewAnimeRankingInput struct {
 	Description string         `json:"description"`
 	AnimeImage  graphql.Upload `json:"animeImage"`
 }
-
-type UserInformationInput struct {
-	Name        string         `json:"name"`
-	Password    string         `json:"password"`
-	Description string         `json:"description"`
-	ProfieImage graphql.Upload `json:"profieImage"`
-}
-
 type UpdateAnimeRankingInput struct {
 	Title       *string         `json:"title"`
 	Description *string         `json:"description"`
