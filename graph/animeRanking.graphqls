@@ -1,0 +1,24 @@
+type AnimeRanking {
+  animeID: Int!
+  title: String!
+  description: String
+  animeImageURL: String!
+  rank: Int!
+  user: User!
+}
+
+input NewAnimeRankingInput {
+  title: String!
+  description: String
+  rank: Int!
+  animeImage: Upload!
+}
+
+extend type Query{
+  getAnimeRanking(id:Int!):AnimeRanking!
+}
+extend type Mutation {
+  createAnimeRanking(input: NewAnimeRankingInput!): AnimeRanking!@auth
+  updateAnimeRanking(animeID: Int!, input: UpdateAnimeRankingInput!): AnimeRanking!@auth
+  deleteAnimeRanking(animeID: Int!): DeletePayload!@auth
+}
