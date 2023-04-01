@@ -13,6 +13,7 @@ import (
 	"github.com/yuorei/anime-ranking/database/table"
 	"github.com/yuorei/anime-ranking/graph/model"
 	"github.com/yuorei/anime-ranking/middlewares"
+	"github.com/yuorei/anime-ranking/service"
 )
 
 // RegisterUser is the resolver for the registerUser field.
@@ -21,10 +22,10 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 	if err != nil {
 		return nil, err
 	}
-
+	hashedPassword := service.HashPassword(input.Password)
 	user := table.User{
 		Name:           input.Name,
-		Password:       input.Password,
+		Password:       hashedPassword,
 		ProfieImageURL: result.Location,
 	}
 
