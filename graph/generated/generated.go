@@ -426,7 +426,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../animeRanking.graphqls", Input: `type AnimeRanking {
+	{Name: "../schema/animeRanking.graphqls", Input: `type AnimeRanking {
   animeID: Int!
   title: String!
   description: String
@@ -451,7 +451,7 @@ extend type Mutation {
   deleteAnimeRanking(animeID: Int!): DeletePayload!@auth
 }
 `, BuiltIn: false},
-	{Name: "../auth.graphqls", Input: `directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+	{Name: "../schema/auth.graphqls", Input: `directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 
 # new directive
 directive @auth on FIELD_DEFINITION
@@ -474,7 +474,7 @@ type LoginResponse {
   token: String
 }
 `, BuiltIn: false},
-	{Name: "../uesr.graphqls", Input: `scalar Upload
+	{Name: "../schema/uesr.graphqls", Input: `scalar Upload
 
 type User {
   userID: Int!
