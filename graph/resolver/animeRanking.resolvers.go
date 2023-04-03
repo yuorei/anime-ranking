@@ -7,13 +7,20 @@ package resolver
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/yuorei/anime-ranking/application"
 	"github.com/yuorei/anime-ranking/database/mysql"
 	"github.com/yuorei/anime-ranking/database/table"
+	"github.com/yuorei/anime-ranking/graph/generated"
 	"github.com/yuorei/anime-ranking/graph/model"
 	"github.com/yuorei/anime-ranking/middlewares"
 )
+
+// ID is the resolver for the id field.
+func (r *animeRankingResolver) ID(ctx context.Context, obj *model.AnimeRanking) (string, error) {
+	return fmt.Sprintf("%s:%s", "anime", obj.ID), nil
+}
 
 // CreateAnimeRanking is the resolver for the createAnimeRanking field.
 func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRanking, error) {
@@ -38,7 +45,7 @@ func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.N
 	}
 
 	return &model.AnimeRanking{
-		AnimeID:       int(anime.ID),
+		ID:            strconv.Itoa(int(anime.ID)),
 		Title:         anime.Title,
 		Rank:          anime.Rank,
 		Description:   &anime.Description,
@@ -47,8 +54,14 @@ func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.N
 }
 
 // UpdateAnimeRanking is the resolver for the updateAnimeRanking field.
-func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, animeID int, input model.UpdateAnimeRankingInput) (*model.AnimeRanking, error) {
+func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, id string, input model.UpdateAnimeRankingInput) (*model.AnimeRanking, error) {
 	customClaim := middlewares.CtxValue(ctx)
+
+	animeID, err := application.JudgeID("anime", id)
+	if err != nil {
+		return nil, err
+	}
+
 	oldAnime, err := mysql.GetAnimeRankingByID(animeID)
 	if err != nil {
 		return nil, err
@@ -82,7 +95,7 @@ func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, animeID int, 
 	}
 
 	return &model.AnimeRanking{
-		AnimeID:       int(newAnime.ID),
+		ID:            strconv.Itoa(int(newAnime.ID)),
 		Title:         newAnime.Title,
 		Description:   &newAnime.Description,
 		AnimeImageURL: newAnime.AnimeImageURL,
@@ -92,8 +105,14 @@ func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, animeID int, 
 }
 
 // DeleteAnimeRanking is the resolver for the deleteAnimeRanking field.
-func (r *mutationResolver) DeleteAnimeRanking(ctx context.Context, animeID int) (*model.DeletePayload, error) {
+func (r *mutationResolver) DeleteAnimeRanking(ctx context.Context, id string) (*model.DeletePayload, error) {
 	customClaim := middlewares.CtxValue(ctx)
+
+	animeID, err := application.JudgeID("anime", id)
+	if err != nil {
+		return nil, err
+	}
+
 	anime, err := mysql.GetAnimeRankingByID(animeID)
 	if err != nil {
 		return &model.DeletePayload{
@@ -106,8 +125,8 @@ func (r *mutationResolver) DeleteAnimeRanking(ctx context.Context, animeID int) 
 			Success: false,
 		}, fmt.Errorf("userIDが違います")
 	}
-	delete, err := mysql.DeleteAnimeRanking(anime)
-	if err != nil || delete {
+	err = mysql.DeleteAnimeRanking(anime)
+	if err != nil {
 		return &model.DeletePayload{
 			Success: false,
 		}, err
@@ -118,13 +137,18 @@ func (r *mutationResolver) DeleteAnimeRanking(ctx context.Context, animeID int) 
 }
 
 // GetAnimeRanking is the resolver for the getAnimeRanking field.
-func (r *queryResolver) GetAnimeRanking(ctx context.Context, id int) (*model.AnimeRanking, error) {
-	anime, err := mysql.GetAnimeRankingByID(id)
+func (r *queryResolver) GetAnimeRanking(ctx context.Context, id string) (*model.AnimeRanking, error) {
+	animeID, err := application.JudgeID("anime", id)
+	if err != nil {
+		return nil, err
+	}
+
+	anime, err := mysql.GetAnimeRankingByID(animeID)
 	if err != nil {
 		return nil, err
 	}
 	result := &model.AnimeRanking{
-		AnimeID:       int(anime.ID),
+		ID:            strconv.Itoa(int(anime.ID)),
 		Title:         anime.Title,
 		Rank:          anime.Rank,
 		Description:   &anime.Description,
@@ -132,3 +156,8 @@ func (r *queryResolver) GetAnimeRanking(ctx context.Context, id int) (*model.Ani
 	}
 	return result, nil
 }
+
+// AnimeRanking returns generated.AnimeRankingResolver implementation.
+func (r *Resolver) AnimeRanking() generated.AnimeRankingResolver { return &animeRankingResolver{r} }
+
+type animeRankingResolver struct{ *Resolver }
