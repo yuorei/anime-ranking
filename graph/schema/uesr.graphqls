@@ -1,7 +1,7 @@
 scalar Upload
 
-type User {
-  userID: Int!
+type User implements Node {
+  id: ID! @goField(forceResolver: true)
   name: String!
   password:String!
   profieImageURL: String!
@@ -35,7 +35,7 @@ type DeletePayload{
 
 type Query {
   GetAllUserInformation: [User!]!
-  user(id: Int!): User
+  user(id: ID!): User
 }
 
 type Mutation {

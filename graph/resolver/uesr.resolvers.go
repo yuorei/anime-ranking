@@ -6,6 +6,8 @@ package resolver
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 
 	"github.com/yuorei/anime-ranking/application"
 	"github.com/yuorei/anime-ranking/database/mysql"
@@ -32,7 +34,7 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 	user, err = mysql.InsertUser(user)
 
 	userPayload := &model.User{
-		UserID:         int(user.ID),
+		ID:             strconv.Itoa(int(user.ID)),
 		Name:           user.Name,
 		Password:       user.Password,
 		ProfieImageURL: user.ProfieImageURL,
@@ -73,7 +75,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUse
 	}
 
 	return &model.User{
-		UserID:         int(newUser.ID),
+		ID:             strconv.Itoa(int(newUser.ID)),
 		Name:           newUser.Name,
 		Password:       newUser.Password,
 		ProfieImageURL: newUser.ProfieImageURL,
@@ -120,7 +122,7 @@ func (r *queryResolver) GetAllUserInformation(ctx context.Context) ([]*model.Use
 	newUsers := make([]*model.User, len(users))
 	for i, user := range users {
 		newUsers[i] = &model.User{
-			UserID:         int(user.ID),
+			ID:             strconv.Itoa(int(user.ID)),
 			Name:           user.Name,
 			Password:       user.Password,
 			ProfieImageURL: user.ProfieImageURL,
@@ -130,23 +132,37 @@ func (r *queryResolver) GetAllUserInformation(ctx context.Context) ([]*model.Use
 }
 
 // User is the resolver for the user field.
-func (r *queryResolver) User(ctx context.Context, id int) (*model.User, error) {
-	tableUser, err := mysql.GetUserByID(id)
+func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+	userID, err := application.JudgeID("user", id)
+	if err != nil {
+		return nil, err
+	}
+
+	tableUser, err := mysql.GetUserByID(userID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &model.User{
-		UserID:         int(tableUser.ID),
+		ID:             strconv.Itoa(int(tableUser.ID)),
 		Name:           tableUser.Name,
 		Password:       tableUser.Password,
 		ProfieImageURL: tableUser.ProfieImageURL,
 	}, nil
 }
 
+// ID is the resolver for the id field.
+func (r *userResolver) ID(ctx context.Context, obj *model.User) (string, error) {
+	return fmt.Sprintf("%s:%s", "user", obj.ID), nil
+}
+
 // HaveAnime is the resolver for the haveAnime field.
 func (r *userResolver) HaveAnime(ctx context.Context, obj *model.User) ([]*model.AnimeRanking, error) {
-	tableAnime, err := mysql.GetHaveAnimeByUserID(int(obj.UserID))
+	i, err := strconv.Atoi(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+	tableAnime, err := mysql.GetHaveAnimeByUserID(i)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +172,7 @@ func (r *userResolver) HaveAnime(ctx context.Context, obj *model.User) ([]*model
 		description := new(string)
 		*description = v.Description
 		usersHaveAnime[i] = &model.AnimeRanking{
-			AnimeID:       int(v.ID),
+			ID:            strconv.Itoa(int(v.ID)),
 			Title:         v.Title,
 			Description:   description,
 			AnimeImageURL: v.AnimeImageURL,
