@@ -126,11 +126,11 @@ func UpdateUser(user table.User) (table.User, error) {
 	return user, nil
 }
 
-func DeleteAnimeRanking(anime table.AnimeRanking) (bool, error) {
+func DeleteAnimeRanking(anime table.AnimeRanking) error {
 	if err := db.Conn.Delete(&anime).Error; err != nil {
-		return false, err
+		return err
 	}
-	return true, nil
+	return nil
 }
 
 func DeleteUser(user table.User) error {
