@@ -26,7 +26,7 @@ ORMとしてgormを使用しています。
 ### 画像アップロード先
 - AWS S3
 ## 開発していた環境
-Mac OS
+- Mac OS
 ## 使い方
 ローカルで立ち上げる場合
 ```
@@ -44,6 +44,24 @@ go version
 go get hogehoge
 ```
 でインストールしてください
+
+MySQLのインストールをしてください
+MySQLのサーバーを起動して
+データベースを作ってください
+
+`.env`をmain.goと同じディレクトリにおいてください
+中身については以下を参考にしてください
+```
+DB_USER=データベースのユーザー名
+DB_PASS=データベースのパスワード
+DB_NAME=データベース名
+DB_PORT=127.0.0.1:3306 // これはローカル
+DB_TZ=True&loc=Local
+
+JWT_SECRET=何らかの文字列
+S3_BUCKET_NAME=S3のバケット名
+S3_REGION=S3のリージョン
+```
 すべて完了した場合は
 ```
 go run main.go
