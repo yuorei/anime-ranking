@@ -18,10 +18,10 @@
 ### APIアーキテクチャ
 - GraphQL API
 ### フレームワーク
-- gqlgen
+- gqlgen  
 GraphQL APIを扱うためのフレームワークです。
 ### データベース
-- MySQL
+- MySQL  
 ORMとしてgormを使用しています。
 ### 画像アップロード先
 - AWS S3
