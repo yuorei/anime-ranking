@@ -1,5 +1,5 @@
-type AnimeRanking {
-  animeID: Int!
+type AnimeRanking implements Node{
+  id: ID! @goField(forceResolver: true)
   title: String!
   description: String
   animeImageURL: String!
@@ -15,10 +15,10 @@ input NewAnimeRankingInput {
 }
 
 extend type Query{
-  getAnimeRanking(id:Int!):AnimeRanking!
+  getAnimeRanking(id:ID!):AnimeRanking!
 }
 extend type Mutation {
   createAnimeRanking(input: NewAnimeRankingInput!): AnimeRanking!@auth
-  updateAnimeRanking(animeID: Int!, input: UpdateAnimeRankingInput!): AnimeRanking!@auth
-  deleteAnimeRanking(animeID: Int!): DeletePayload!@auth
+  updateAnimeRanking(id: ID!, input: UpdateAnimeRankingInput!): AnimeRanking!@auth
+  deleteAnimeRanking(id: ID!): DeletePayload!@auth
 }
