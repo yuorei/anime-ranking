@@ -28,6 +28,7 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 	user := table.User{
 		Name:           input.Name,
 		Password:       hashedPassword,
+		Description:    input.Description,
 		ProfieImageURL: result.Location,
 	}
 
@@ -37,6 +38,7 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 		ID:             strconv.Itoa(int(user.ID)),
 		Name:           user.Name,
 		Password:       user.Password,
+		Description:    &user.Description,
 		ProfieImageURL: user.ProfieImageURL,
 		HaveAnime:      nil,
 	}
