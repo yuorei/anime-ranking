@@ -481,6 +481,9 @@ type LoginResponse {
 }
 `, BuiltIn: false},
 	{Name: "../schema/node.graphqls", Input: `interface Node {
+  """
+  任意のID
+  """
   id: ID!
 }
 `, BuiltIn: false},
