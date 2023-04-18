@@ -1,3 +1,6 @@
 interface Node {
+  """
+  任意のID
+  """
   id: ID!
 }
