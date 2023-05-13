@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/yuorei/anime-ranking/application"
 	"github.com/yuorei/anime-ranking/database/mysql"
@@ -57,7 +58,7 @@ func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.N
 func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, id string, input model.UpdateAnimeRankingInput) (*model.AnimeRanking, error) {
 	customClaim := middlewares.CtxValue(ctx)
 
-	animeID, err := application.JudgeID("anime", id)
+	animeID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +109,8 @@ func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, id string, in
 func (r *mutationResolver) DeleteAnimeRanking(ctx context.Context, id string) (*model.DeletePayload, error) {
 	customClaim := middlewares.CtxValue(ctx)
 
-	animeID, err := application.JudgeID("anime", id)
+	splitID := strings.Split(id, ":")
+	animeID, err := strconv.Atoi(splitID[1])
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +140,7 @@ func (r *mutationResolver) DeleteAnimeRanking(ctx context.Context, id string) (*
 
 // GetAnimeRanking is the resolver for the getAnimeRanking field.
 func (r *queryResolver) GetAnimeRanking(ctx context.Context, id string) (*model.AnimeRanking, error) {
-	animeID, err := application.JudgeID("anime", id)
+	animeID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
 	}
