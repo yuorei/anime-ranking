@@ -4,7 +4,7 @@ type User implements Node {
   id: ID! @goField(forceResolver: true)
   name: String!
   password:String!
-  profieImageURL: String!
+  profileImageURL: String!
   description: String
   haveAnime:[AnimeRanking!] @goField(forceResolver: true)
 }
@@ -13,7 +13,7 @@ input UserInformationInput {
   name: String!
   password: String!
   description: String
-  profieImage: Upload!
+  profileImage: Upload!
 }
 
 input UpdateAnimeRankingInput {
@@ -26,7 +26,7 @@ input UpdateAnimeRankingInput {
 input UpdateUserInput {
   name: String
   description: String
-  profieImage: Upload
+  profileImage: Upload
 }
 
 type DeletePayload{
