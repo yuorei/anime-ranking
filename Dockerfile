@@ -1,9 +1,10 @@
 FROM golang:1.20
 
-WORKDIR /
+WORKDIR /app
 
 COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 
 COPY . .
-RUN go build -v -o anime-app
+RUN go build -o /docker-anime-ranking
+CMD [ "/docker-anime-ranking" ]
