@@ -28,7 +28,7 @@ func NewMySQL() {
 	DB_TZ := os.Getenv("DB_TZ")
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=%s", DB_USER, DB_PASS, DB_PORT, DB_NAME, DB_TZ)
-	fmt.Println(dsn)
+
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{
@@ -41,7 +41,7 @@ func NewMySQL() {
 
 	db.Conn, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: newLogger})
 	if err != nil {
-		log.Fatal("DB接続失敗: "+err.Error())
+		log.Fatal("DB接続失敗: " + err.Error())
 	}
 
 }
