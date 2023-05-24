@@ -46,7 +46,7 @@ func main() {
 	corsOpts := cors.New(cors.Options{
 		AllowedOrigins: []string{os.Getenv("URL")}, // 許可するOriginを指定
 		AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodOptions},
-		AllowedHeaders: []string{"Content-Type"},
+		AllowedHeaders: []string{"*"},
 	})
 	router.PathPrefix("/query").Handler(corsOpts.Handler(srv))
 	router.PathPrefix("/").Handler(playground.Handler("GraphQL playground", "/query"))
