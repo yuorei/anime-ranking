@@ -27,7 +27,7 @@ func (r *animeRankingResolver) ID(ctx context.Context, obj *model.AnimeRanking) 
 func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRanking, error) {
 	customClaim := middlewares.CtxValue(ctx)
 
-	result, err := application.AWSS3Upload(input.AnimeImage.File, input.AnimeImage.Filename)
+	imageURL, err := application.UploadGCS(input.AnimeImage.File, input.AnimeImage.Filename)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.N
 		Title:         input.Title,
 		Rank:          input.Rank,
 		Description:   input.Description,
-		AnimeImageURL: result.Location,
+		AnimeImageURL: imageURL,
 	}
 
 	anime, err = mysql.InsertAnimeRanking(anime)
@@ -50,7 +50,7 @@ func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.N
 		Title:         anime.Title,
 		Rank:          anime.Rank,
 		Description:   &anime.Description,
-		AnimeImageURL: result.Location,
+		AnimeImageURL: imageURL,
 	}, nil
 }
 
@@ -83,11 +83,11 @@ func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, id string, in
 	}
 
 	if input.AnimeImage != nil {
-		result, err := application.AWSS3Upload(input.AnimeImage.File, input.AnimeImage.Filename)
+		imageURL, err := application.UploadGCS(input.AnimeImage.File, input.AnimeImage.Filename)
 		if err != nil {
 			return nil, err
 		}
-		oldAnime.AnimeImageURL = result.Location
+		oldAnime.AnimeImageURL = imageURL
 	}
 
 	newAnime, err := mysql.UpdateAnimeRanking(animeID, oldAnime)

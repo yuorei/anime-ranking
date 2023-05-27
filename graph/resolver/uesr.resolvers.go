@@ -20,7 +20,7 @@ import (
 
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.User, error) {
-	result, err := application.AWSS3Upload(input.ProfileImage.File, input.ProfileImage.Filename)
+	imageURL, err := application.UploadGCS(input.ProfileImage.File, input.ProfileImage.Filename)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInf
 		Name:            input.Name,
 		Password:        hashedPassword,
 		Description:     input.Description,
-		ProfileImageURL: result.Location,
+		ProfileImageURL: imageURL,
 	}
 
 	user, err = mysql.InsertUser(user)
@@ -64,11 +64,11 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUse
 	}
 
 	if input.ProfileImage != nil {
-		result, err := application.AWSS3Upload(input.ProfileImage.File, input.ProfileImage.Filename)
+		imageURL, err := application.UploadGCS(input.ProfileImage.File, input.ProfileImage.Filename)
 		if err != nil {
 			return nil, err
 		}
-		oldUser.ProfileImageURL = result.Location
+		oldUser.ProfileImageURL = imageURL
 	}
 
 	newUser, err := mysql.UpdateUser(oldUser)
