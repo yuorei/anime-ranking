@@ -21,7 +21,7 @@ GraphQL APIを扱うためのフレームワークです。
 - MySQL  
 ORMとしてgormを使用しています。
 ### 画像アップロード先
-- AWS S3
+- Cloud Strage
 ## 開発していた環境
 - Apple M1 Mac OS 13.2.1
 ## 使い方
