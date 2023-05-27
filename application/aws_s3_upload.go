@@ -15,9 +15,10 @@ import (
 func AWSS3Upload(file io.Reader, filename string) (*s3manager.UploadOutput, error) {
 	// The session the S3 Uploader will use
 	sess, err := session.NewSessionWithOptions(session.Options{
-		Config:  aws.Config{Region: aws.String(os.Getenv("S3_REGION"))},
-		Profile: "default",
+		Config: aws.Config{Region: aws.String(os.Getenv("S3_REGION"))},
+		// Profile: "default",
 	})
+
 	if err != nil {
 		return nil, err
 	}
