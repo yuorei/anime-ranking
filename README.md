@@ -1,4 +1,6 @@
 # my-anime-ranking
+実際のアプリは[こちら](https://my-anime-ranking-front.vercel.app/)  
+フロントエンドのリポジトリは[こちら](https://github.com/yuorei/my-anime-ranking-front)  
 ## 概要
 - こちらはマイアニメランキングアプリのバックエンドです。  
 - 自分の好きなアニメのランキングを共有できるサービスです。  
