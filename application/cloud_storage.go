@@ -50,7 +50,7 @@ func UploadGCS(file io.ReadSeeker, filename string) (string, error) {
 		return "", fmt.Errorf("Writer.Close: %v", err)
 	}
 
-	imageURL := fmt.Sprintf("https://storage.cloud.google.com/%s/%s", os.Getenv("BUCKET"), filename)
+	imageURL := fmt.Sprintf("https://storage.cloud.googleapis.com/%s/%s", os.Getenv("BUCKET"), filename)
 	log.Printf("アップロード成功 %s\n", imageURL)
 	return imageURL, nil
 }
