@@ -1,3 +1,10 @@
 interface Node {
-  id: ID!
+  """
+  任意のID
+  """
+  id: ID! @goField(forceResolver: true)
+}
+
+extend type Query{
+  node(id: ID!): Node!
 }

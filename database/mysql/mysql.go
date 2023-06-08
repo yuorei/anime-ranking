@@ -41,7 +41,7 @@ func NewMySQL() {
 
 	db.Conn, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: newLogger})
 	if err != nil {
-		log.Fatal("DB接続失敗")
+		log.Fatal("DB接続失敗: " + err.Error())
 	}
 
 }

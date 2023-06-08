@@ -5,11 +5,11 @@ idについては番号の先頭に`user:`,`aniem:`のようにつけてくだ�
 - リクエスト
 ```
 mutation 任意の名前($i: Upload!){
-  registerUser(input:{name:"テストユーザー",password:"test1234",description:"これはテストユーザーです",profieImage:$i}){
+  registerUser(input:{name:"テストユーザー",password:"test1234",description:"これはテストユーザーです",profileImage:$i}){
     id
     name
     password
-    profieImageURL
+    profileImageURL
   }
 }
 ```
@@ -21,7 +21,7 @@ mutation 任意の名前($i: Upload!){
       "id": "user:1",
       "name": "テストユーザー",
       "password": "$2a$10$O8yDtapGPXflkyl.8./Obehe90bxQ4Zc6OnfZQKgng3XLMnyzazWa",
-      "profieImageURL": "https://バケット名.s3.リージョン.amazonaws.com/生成されたuuid.ファイルの拡張子"
+      "profileImageURL": "https://バケット名.s3.リージョン.amazonaws.com/生成されたuuid.ファイルの拡張子"
     }
   }
 }
@@ -64,9 +64,9 @@ mutation 任意の名前{
 リクエスト
 ```
 mutation 任意の名前($i: Upload!){
-  updateUser(input:{name:"変更したテストユーザー",profieImage:$i}){
+  updateUser(input:{name:"変更したテストユーザー",profileImage:$i}){
     name
-    profieImageURL
+    profileImageURL
     password
   }
 }
@@ -77,7 +77,7 @@ mutation 任意の名前($i: Upload!){
   "data": {
     "updateUser": {
       "name": "変更したテストユーザー",
-      "profieImageURL": "https://バケット名.s3.リージョン.amazonaws.com/変更された画像の生成されたuuid.ファイルの拡張子",
+      "profileImageURL": "https://バケット名.s3.リージョン.amazonaws.com/変更された画像の生成されたuuid.ファイルの拡張子",
       "password": "$2a$10$O8yDtapGPXflkyl.8./Obehe90bxQ4Zc6OnfZQKgng3XLMnyzazWa"
     }
   }

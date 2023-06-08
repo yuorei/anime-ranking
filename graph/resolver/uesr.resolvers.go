@@ -20,27 +20,27 @@ import (
 
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.User, error) {
-	result, err := application.AWSS3Upload(input.ProfieImage.File, input.ProfieImage.Filename)
+	imageURL, err := application.UploadGCS(input.ProfileImage.File, input.ProfileImage.Filename)
 	if err != nil {
 		return nil, err
 	}
 	hashedPassword := service.HashPassword(input.Password)
 	user := table.User{
-		Name:           input.Name,
-		Password:       hashedPassword,
-		Description:    input.Description,
-		ProfieImageURL: result.Location,
+		Name:            input.Name,
+		Password:        hashedPassword,
+		Description:     input.Description,
+		ProfileImageURL: imageURL,
 	}
 
 	user, err = mysql.InsertUser(user)
 
 	userPayload := &model.User{
-		ID:             strconv.Itoa(int(user.ID)),
-		Name:           user.Name,
-		Password:       user.Password,
-		Description:    &user.Description,
-		ProfieImageURL: user.ProfieImageURL,
-		HaveAnime:      nil,
+		ID:              strconv.Itoa(int(user.ID)),
+		Name:            user.Name,
+		Password:        user.Password,
+		Description:     &user.Description,
+		ProfileImageURL: user.ProfileImageURL,
+		HaveAnime:       nil,
 	}
 	if err != nil {
 		return userPayload, err
@@ -63,12 +63,12 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUse
 		oldUser.Description = *input.Description
 	}
 
-	if input.ProfieImage != nil {
-		result, err := application.AWSS3Upload(input.ProfieImage.File, input.ProfieImage.Filename)
+	if input.ProfileImage != nil {
+		imageURL, err := application.UploadGCS(input.ProfileImage.File, input.ProfileImage.Filename)
 		if err != nil {
 			return nil, err
 		}
-		oldUser.ProfieImageURL = result.Location
+		oldUser.ProfileImageURL = imageURL
 	}
 
 	newUser, err := mysql.UpdateUser(oldUser)
@@ -77,12 +77,12 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUse
 	}
 
 	return &model.User{
-		ID:             strconv.Itoa(int(newUser.ID)),
-		Name:           newUser.Name,
-		Password:       newUser.Password,
-		ProfieImageURL: newUser.ProfieImageURL,
-		Description:    &newUser.Description,
-		HaveAnime:      nil,
+		ID:              strconv.Itoa(int(newUser.ID)),
+		Name:            newUser.Name,
+		Password:        newUser.Password,
+		ProfileImageURL: newUser.ProfileImageURL,
+		Description:     &newUser.Description,
+		HaveAnime:       nil,
 	}, nil
 }
 
@@ -124,10 +124,10 @@ func (r *queryResolver) GetAllUserInformation(ctx context.Context) ([]*model.Use
 	newUsers := make([]*model.User, len(users))
 	for i, user := range users {
 		newUsers[i] = &model.User{
-			ID:             strconv.Itoa(int(user.ID)),
-			Name:           user.Name,
-			Password:       user.Password,
-			ProfieImageURL: user.ProfieImageURL,
+			ID:              strconv.Itoa(int(user.ID)),
+			Name:            user.Name,
+			Password:        user.Password,
+			ProfileImageURL: user.ProfileImageURL,
 		}
 	}
 	return newUsers, nil
@@ -135,7 +135,7 @@ func (r *queryResolver) GetAllUserInformation(ctx context.Context) ([]*model.Use
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
-	userID, err := application.JudgeID("user", id)
+	userID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
 	}
@@ -146,10 +146,10 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 	}
 
 	return &model.User{
-		ID:             strconv.Itoa(int(tableUser.ID)),
-		Name:           tableUser.Name,
-		Password:       tableUser.Password,
-		ProfieImageURL: tableUser.ProfieImageURL,
+		ID:              strconv.Itoa(int(tableUser.ID)),
+		Name:            tableUser.Name,
+		Password:        tableUser.Password,
+		ProfileImageURL: tableUser.ProfileImageURL,
 	}, nil
 }
 
