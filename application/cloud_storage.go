@@ -1,8 +1,10 @@
 package application
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"image/jpeg"
 	"io"
 	"log"
 	"os"
@@ -10,10 +12,24 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
+
 	"github.com/google/uuid"
+	"github.com/kolesa-team/go-webp/webp"
 )
 
 func UploadGCS(file io.ReadSeeker, filename string) (string, error) {
+	// JPEG画像をデコード
+	img, err := jpeg.Decode(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// WebPに変換
+	webpBuffer := new(bytes.Buffer)
+	if err := webp.Encode(webpBuffer, img, nil); err != nil {
+		log.Fatalln(err)
+	}
+
 	bucket := os.Getenv("BUCKET")
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
@@ -43,7 +59,7 @@ func UploadGCS(file io.ReadSeeker, filename string) (string, error) {
 
 	// Upload an object with storage.Writer.
 	wc := o.NewWriter(ctx)
-	if _, err = io.Copy(wc, file); err != nil {
+	if _, err = io.Copy(wc, webpBuffer); err != nil {
 		return "", fmt.Errorf("io.Copy: %v", err)
 	}
 	if err := wc.Close(); err != nil {

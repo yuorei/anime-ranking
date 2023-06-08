@@ -10,6 +10,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
 	github.com/joho/godotenv v1.5.1
+	github.com/kolesa-team/go-webp v1.0.4
 	github.com/rs/cors v1.8.3
 	github.com/vektah/gqlparser/v2 v2.5.1
 	golang.org/x/crypto v0.9.0
