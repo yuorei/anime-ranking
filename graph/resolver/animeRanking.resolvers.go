@@ -27,7 +27,7 @@ func (r *animeRankingResolver) ID(ctx context.Context, obj *model.AnimeRanking) 
 func (r *mutationResolver) CreateAnimeRanking(ctx context.Context, input model.NewAnimeRankingInput) (*model.AnimeRanking, error) {
 	customClaim := middlewares.CtxValue(ctx)
 
-	imageURL, err := application.UploadGCS(input.AnimeImage.File, input.AnimeImage.Filename)
+	imageURL, err := application.UploadGCS(input.AnimeImage)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (r *mutationResolver) UpdateAnimeRanking(ctx context.Context, id string, in
 	}
 
 	if input.AnimeImage != nil {
-		imageURL, err := application.UploadGCS(input.AnimeImage.File, input.AnimeImage.Filename)
+		imageURL, err := application.UploadGCS(*input.AnimeImage)
 		if err != nil {
 			return nil, err
 		}
