@@ -22,43 +22,9 @@ import (
 const fileLimitSize = 500000
 
 func UploadGCS(file graphql.Upload) (string, error) {
-	if file.Size > fileLimitSize {
-		return "", fmt.Errorf("ファイルサイズが大きすぎます。500KB以下にしてください。")
-	}
-
-	var image image.Image
-	switch file.ContentType {
-	case "image/jpeg":
-		// JPEG画像をデコード
-		img, err := jpeg.Decode(file.File)
-		if err != nil {
-			return "", fmt.Errorf("JPEG画像をデコードに失敗しました")
-		}
-		image = img
-
-	case "image/png":
-		// PNG画像をデコード
-		img, err := png.Decode(file.File)
-		if err != nil {
-			return "", fmt.Errorf("PNG画像をデコードに失敗しました")
-		}
-		image = img
-	case "image/webp":
-		// WEBP画像をデコード
-		img, err := webp.Decode(file.File, nil)
-		if err != nil {
-			return "", fmt.Errorf("WEBP画像をデコードに失敗しました")
-		}
-		image = img
-	default:
-		return "", fmt.Errorf("対応していないファイルです")
-	}
-
-	// WebPに変換
-	webpBuffer := new(bytes.Buffer)
-	err := webp.Encode(webpBuffer, image, nil)
+	webpBuffer, err := ConvertToWebp(file)
 	if err != nil {
-		return "", fmt.Errorf("WEBP画像にエンコードに失敗しました")
+		return "", err
 	}
 
 	bucket := os.Getenv("BUCKET")
@@ -100,4 +66,47 @@ func UploadGCS(file graphql.Upload) (string, error) {
 	imageURL := fmt.Sprintf("https://storage.googleapis.com/%s/%s", os.Getenv("BUCKET"), filename)
 	log.Printf("アップロード成功 %s\n", imageURL)
 	return imageURL, nil
+}
+
+func ConvertToWebp(file graphql.Upload) (*bytes.Buffer, error) {
+	if file.Size > fileLimitSize {
+		return nil, fmt.Errorf("ファイルサイズが大きすぎます。500KB以下にしてください。")
+	}
+
+	var image image.Image
+	switch file.ContentType {
+	case "image/jpeg":
+		// JPEG画像をデコード
+		img, err := jpeg.Decode(file.File)
+		if err != nil {
+			return nil, fmt.Errorf("JPEG画像をデコードに失敗しました")
+		}
+		image = img
+
+	case "image/png":
+		// PNG画像をデコード
+		img, err := png.Decode(file.File)
+		if err != nil {
+			return nil, fmt.Errorf("PNG画像をデコードに失敗しました")
+		}
+		image = img
+	case "image/webp":
+		// WEBP画像をデコード
+		img, err := webp.Decode(file.File, nil)
+		if err != nil {
+			return nil, fmt.Errorf("WEBP画像をデコードに失敗しました")
+		}
+		image = img
+	default:
+		return nil, fmt.Errorf("対応していないファイルです")
+	}
+
+	// WebPに変換
+	webpBuffer := new(bytes.Buffer)
+	err := webp.Encode(webpBuffer, image, nil)
+	if err != nil {
+		return nil, fmt.Errorf("WEBP画像にエンコードに失敗しました")
+	}
+
+	return webpBuffer, nil
 }
