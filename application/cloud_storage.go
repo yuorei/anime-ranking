@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"image"
 	"image/jpeg"
+	"image/png"
 	"io"
 	"log"
 	"os"
-	"strings"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -18,17 +19,46 @@ import (
 	"github.com/kolesa-team/go-webp/webp"
 )
 
+const fileLimitSize = 500000
+
 func UploadGCS(file graphql.Upload) (string, error) {
-	// JPEG画像をデコード
-	img, err := jpeg.Decode(file.File)
-	if err != nil {
-		log.Fatal(err)
+	if file.Size > fileLimitSize {
+		return "", fmt.Errorf("ファイルサイズが大きすぎます。500KB以下にしてください。")
+	}
+
+	var image image.Image
+	switch file.ContentType {
+	case "image/jpeg":
+		// JPEG画像をデコード
+		img, err := jpeg.Decode(file.File)
+		if err != nil {
+			return "", fmt.Errorf("JPEG画像をデコードに失敗しました")
+		}
+		image = img
+
+	case "image/png":
+		// PNG画像をデコード
+		img, err := png.Decode(file.File)
+		if err != nil {
+			return "", fmt.Errorf("PNG画像をデコードに失敗しました")
+		}
+		image = img
+	case "image/webp":
+		// WEBP画像をデコード
+		img, err := webp.Decode(file.File, nil)
+		if err != nil {
+			return "", fmt.Errorf("WEBP画像をデコードに失敗しました")
+		}
+		image = img
+	default:
+		return "", fmt.Errorf("対応していないファイルです")
 	}
 
 	// WebPに変換
 	webpBuffer := new(bytes.Buffer)
-	if err := webp.Encode(webpBuffer, img, nil); err != nil {
-		log.Fatalln(err)
+	err := webp.Encode(webpBuffer, image, nil)
+	if err != nil {
+		return "", fmt.Errorf("WEBP画像にエンコードに失敗しました")
 	}
 
 	bucket := os.Getenv("BUCKET")
@@ -41,10 +71,9 @@ func UploadGCS(file graphql.Upload) (string, error) {
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second*50)
 	defer cancel()
-	filename := file.Filename
-	arr1 := strings.Split(filename, ".")
+
 	uu, _ := uuid.NewRandom()
-	filename = uu.String() + "." + arr1[1]
+	filename := uu.String() + ".webp"
 	o := client.Bucket(bucket).Object(filename)
 	// Optional: set a generation-match precondition to avoid potential race
 	// conditions and data corruptions. The request to upload is aborted if the
