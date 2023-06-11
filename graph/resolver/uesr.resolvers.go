@@ -20,7 +20,7 @@ import (
 
 // RegisterUser is the resolver for the registerUser field.
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.UserInformationInput) (*model.User, error) {
-	imageURL, err := application.UploadGCS(input.ProfileImage.File, input.ProfileImage.Filename)
+	imageURL, err := application.UploadGCS(input.ProfileImage)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUse
 	}
 
 	if input.ProfileImage != nil {
-		imageURL, err := application.UploadGCS(input.ProfileImage.File, input.ProfileImage.Filename)
+		imageURL, err := application.UploadGCS(*input.ProfileImage)
 		if err != nil {
 			return nil, err
 		}

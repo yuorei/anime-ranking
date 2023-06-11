@@ -13,13 +13,14 @@ import (
 
 	"cloud.google.com/go/storage"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/google/uuid"
 	"github.com/kolesa-team/go-webp/webp"
 )
 
-func UploadGCS(file io.ReadSeeker, filename string) (string, error) {
+func UploadGCS(file graphql.Upload) (string, error) {
 	// JPEG画像をデコード
-	img, err := jpeg.Decode(file)
+	img, err := jpeg.Decode(file.File)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,6 +41,7 @@ func UploadGCS(file io.ReadSeeker, filename string) (string, error) {
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second*50)
 	defer cancel()
+	filename := file.Filename
 	arr1 := strings.Split(filename, ".")
 	uu, _ := uuid.NewRandom()
 	filename = uu.String() + "." + arr1[1]
