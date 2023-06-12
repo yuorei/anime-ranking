@@ -11,5 +11,6 @@ RUN go mod download && go mod verify
 COPY . .
 
 RUN go build  -o anime-app
+RUN anime-app
 
 EXPOSE 8080
