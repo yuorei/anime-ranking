@@ -104,7 +104,7 @@ func GetUserByID(id int) (table.User, error) {
 
 func GetHaveAnimeByUserID(id int) ([]table.AnimeRanking, error) {
 	var animes []table.AnimeRanking
-	if err := db.Conn.Where("user_id = ?", id).Find(&animes).Error; err != nil {
+	if err := db.Conn.Where("user_id = ?", id).Order("`rank` ASC").Find(&animes).Error; err != nil {
 		return animes, err
 	}
 	return animes, nil
