@@ -1,5 +1,5 @@
 # my-anime-ranking
-実際のアプリは[こちら](https://my-anime-ranking-front.vercel.app/)  
+実際のアプリは[こちら](https://my-anime-ranking-front.vercel.app/)  ＊現在はバックエンドが動いておりません。
 フロントエンドのリポジトリは[こちら](https://github.com/yuorei/my-anime-ranking-front)  
 ## 概要
 - こちらはマイアニメランキングアプリのバックエンドです。  
@@ -43,6 +43,9 @@ go version
 go get hogehoge
 ```
 でインストールしてください
+
+webp ツールもインストールしてください。  
+https://github.com/kolesa-team/go-webp
 
 MySQLのインストールをしてください
 MySQLのサーバーを起動して
